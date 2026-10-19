@@ -2,14 +2,17 @@
  * ============================================================
  *  MOM'S LUXURY BIRTHDAY SURPRISE — CONFIGURATION
  * ============================================================
- *  Edit this file to customize text, personal messages, and photos!
+ *  Configured with your 6 personal photos and birthday audio!
  * ============================================================
  */
 
 const birthdayConfig = {
   // ── General Info ──────────────────────────────────────────
-  momName: "Mom",               // e.g., "Mom", "Mama", "Sarah"
-  senderName: "Your Child",     // e.g., "Your loving daughter", "Michael"
+  momName: "Mom",
+  senderName: "With All My Love",
+
+  // ── Background Audio ──────────────────────────────────────
+  audioFile: "sub_clair-happy-birthday-592177.mp3",
 
   // ── Page 1: Opening Envelope ──────────────────────────────
   envelope: {
@@ -51,62 +54,49 @@ const birthdayConfig = {
     heading: "Every picture holds a little piece of my heart.",
     subtitle: "A journey through our favorite memories together.",
     
-    // Replace these with your real photo files in public/images/ or images/
-    // If a photo file is missing, an elegant placeholder displays automatically.
+    // Configured with your 6 real photos
     photos: [
       {
-        src: "images/photo-1.jpg",
-        caption: "Your smile that brightens every room",
-        date: "Cherished Memory",
+        src: "WhatsApp Image 2026-10-19 at 9.54.30 PM.jpeg",
+        caption: "Your radiant smile that lights up our world",
+        date: "Cherished Moment",
+        alt: "Beautiful photo of Mom"
+      },
+      {
+        src: "WhatsApp Image 2026-10-19 at 9.55.09 PM.jpeg",
+        caption: "All the warmth, love, and laughter you bring",
+        date: "Priceless Memory",
         alt: "Mom smiling warmly"
       },
       {
-        src: "images/photo-2.jpg",
-        caption: "All the laughter we share together",
-        date: "Family Moments",
-        alt: "Laughing together with Mom"
-      },
-      {
-        src: "images/photo-3.jpg",
-        caption: "Your comforting hugs that make everything okay",
-        date: "Pure Warmth",
-        alt: "Warm embrace with Mom"
-      },
-      {
-        src: "images/photo-4.jpg",
-        caption: "Adventures and beautiful days out",
-        date: "Sweet Times",
-        alt: "Trip and adventure with Mom"
-      },
-      {
-        src: "images/photo-5.jpg",
-        caption: "Standing proudly by my side at every milestone",
-        date: "Always There",
-        alt: "Mom celebrating a milestone"
-      },
-      {
-        src: "images/photo-6.jpg",
-        caption: "Quiet mornings and heart-to-heart talks",
-        date: "Priceless",
-        alt: "Tea and conversation with Mom"
-      },
-      {
-        src: "images/hero.jpg",
+        src: "WhatsApp Image 2026-10-19 at 9.56.50 PM.jpeg",
         caption: "The queen of our hearts, today and always",
         date: "Queen Mom",
-        alt: "Portrait of Mom"
+        alt: "Memorable moment with Mom"
       },
       {
-        src: "images/final.jpg",
-        caption: "Forever grateful for everything you are",
+        src: "WhatsApp Image 2026-10-19 at 9.57.45 PM.jpeg",
+        caption: "Every hug and quiet moment with you is a blessing",
+        date: "Pure Warmth",
+        alt: "Sweet memory with Mom"
+      },
+      {
+        src: "WhatsApp Image 2026-10-19 at 9.59.06 PM.jpeg",
+        caption: "Your strength and kindness guide me every day",
+        date: "Always Grateful",
+        alt: "Mom looking beautiful"
+      },
+      {
+        src: "received_2297448677452112.jpeg",
+        caption: "Forever grateful for everything you are to us",
         date: "Always & Forever",
-        alt: "Mom always loved"
+        alt: "Cherished photo of Mom"
       }
     ],
 
     closingHeading: "Happy Birthday, Mom ❤️",
     closingMessage: "Whatever life brings, I hope you always know how deeply and endlessly loved you are.",
-    signature: "Made with love, just for you."
+    signature: "Made with all my love, just for you."
   }
 };
 
