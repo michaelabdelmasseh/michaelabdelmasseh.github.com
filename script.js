@@ -237,6 +237,7 @@ document.addEventListener("DOMContentLoaded", () => {
     isEnvelopeOpened = true;
     envelopeElement.classList.add("opened");
     playChime();
+    playMusic();
   }
 
   if (envelopeElement) {
@@ -513,6 +514,15 @@ document.addEventListener("DOMContentLoaded", () => {
   let isMusicPlaying = false;
   let synthLoop = null;
 
+  // Set audio source from config
+  if (bgAudio) {
+    if (config.audioFile) {
+      bgAudio.src = config.audioFile;
+    } else if (!bgAudio.src && bgAudio.querySelector("source")) {
+      bgAudio.src = bgAudio.querySelector("source").getAttribute("src");
+    }
+  }
+
   function startAmbientPiano() {
     const scale = [261.63, 329.63, 392.0, 440.0, 523.25];
     playPianoNote();
@@ -545,6 +555,27 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
+  function playMusic() {
+    if (isMusicPlaying) return;
+    if (bgAudio && bgAudio.src && !bgAudio.src.endsWith("none")) {
+      bgAudio
+        .play()
+        .then(() => setMusicState(true))
+        .catch((err) => {
+          console.warn("Autoplay was blocked or waiting for user interaction:", err);
+        });
+    } else {
+      startAmbientPiano();
+      setMusicState(true);
+    }
+  }
+
+  function pauseMusic() {
+    if (bgAudio) bgAudio.pause();
+    stopAmbientPiano();
+    setMusicState(false);
+  }
+
   if (musicToggleBtn) {
     musicToggleBtn.addEventListener("click", () => {
       if (!isMusicPlaying) {
@@ -561,23 +592,41 @@ document.addEventListener("DOMContentLoaded", () => {
           setMusicState(true);
         }
       } else {
-        if (bgAudio) bgAudio.pause();
-        stopAmbientPiano();
-        setMusicState(false);
+        pauseMusic();
       }
     });
   }
 
   function setMusicState(playing) {
     isMusicPlaying = playing;
-    if (playing) {
-      musicToggleBtn.classList.add("playing");
-      musicLabel.textContent = "Pause Music";
-    } else {
-      musicToggleBtn.classList.remove("playing");
-      musicLabel.textContent = "Play Music";
+    if (musicToggleBtn && musicLabel) {
+      if (playing) {
+        musicToggleBtn.classList.add("playing");
+        musicLabel.textContent = "Pause Music";
+      } else {
+        musicToggleBtn.classList.remove("playing");
+        musicLabel.textContent = "Play Music";
+      }
     }
   }
+
+  // Attempt instant autoplay when page loads
+  playMusic();
+
+  // Modern browsers block autoplay with sound unless the user interacts.
+  // One-time listener: on the very first touch/click anywhere or opening letter, audio starts immediately!
+  const unlockEvents = ["click", "touchstart", "pointerdown", "keydown"];
+  function unlockAudioHandler() {
+    if (!isMusicPlaying) {
+      playMusic();
+    }
+    unlockEvents.forEach((evt) => {
+      window.removeEventListener(evt, unlockAudioHandler, true);
+    });
+  }
+  unlockEvents.forEach((evt) => {
+    window.addEventListener(evt, unlockAudioHandler, { capture: true, passive: true });
+  });
 
   // --------------------------------------------------------
   // 10. ATMOSPHERE CANVAS (Subtle Petals & Golden Sparkles)
