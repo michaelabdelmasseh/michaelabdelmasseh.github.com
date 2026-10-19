@@ -3,495 +3,311 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Happy Birthday Mom! With All My Love ❤️</title>
-  
-  <!-- Google Fonts -->
+  <title>A Special Surprise For Mom ❤️</title>
+
+  <!-- Google Fonts: Playfair Display, Dancing Script, Plus Jakarta Sans -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600;700&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Plus+Jakarta+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
-  
+  <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600;700&family=Playfair+Display:ital,wght@0,500;0,700;1,400;1,600&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-  <!-- Floating Falling Rose Petals Canvas -->
-  <canvas id="petals-canvas" aria-hidden="true"></canvas>
+  <!-- Floating Canvas Layers -->
+  <canvas id="petalsCanvas" aria-hidden="true"></canvas>
+  <canvas id="confettiCanvas" aria-hidden="true"></canvas>
 
-  <!-- Confetti Canvas -->
-  <canvas id="confetti-canvas" aria-hidden="true"></canvas>
-
-  <!-- Background Music Player Widget -->
-  <div class="music-widget" id="musicWidget">
-    <button id="musicToggleBtn" class="music-btn" aria-label="Toggle background music" title="Play relaxing birthday melody">
+  <!-- Background Music Control -->
+  <div class="music-widget">
+    <button id="musicToggleBtn" class="music-btn" aria-label="Toggle music">
       <span class="music-icon" id="musicIcon">🎵</span>
       <span class="music-label" id="musicLabel">Play Music</span>
     </button>
     <audio id="bgAudio" loop preload="none">
-      <!-- You can put your mp3 file here: e.g. src="audio/music.mp3" -->
       <source src="audio/music.mp3" type="audio/mpeg">
     </audio>
   </div>
 
+  <!-- Screen Flash for Teleport transitions -->
+  <div id="teleportFlash" class="teleport-flash"></div>
+
   <!-- ========================================================
-       SECTION A: A SPECIAL WELCOME (Full-screen Opening)
+       STAGE 1: THE REALISTIC ENVELOPE (الظرف)
   ======================================================== -->
-  <header id="welcome" class="welcome-screen">
-    <div class="welcome-overlay"></div>
-    <div class="welcome-container">
-      <div class="envelope-wrapper">
-        <div class="floating-hearts-bg">
-          <span class="sparkle s1">✨</span>
-          <span class="sparkle s2">🌸</span>
-          <span class="sparkle s3">✨</span>
-          <span class="sparkle s4">💖</span>
-        </div>
-        
-        <div class="stamp-seal">💌</div>
-        <p class="script-subtitle">A little surprise, made with all my love</p>
-        <h1 class="welcome-title">To the Most Wonderful Mom in the World</h1>
-        
-        <div class="envelope-box">
-          <div class="envelope-letter-preview">
-            <span>For you, Mom</span>
-          </div>
-        </div>
+  <main id="stage1" class="stage active">
+    <div class="stage-container text-center">
+      <div class="stage-badge">✨ Made With All My Love ✨</div>
+      <h1 class="main-title">A Special Letter For Mom</h1>
+      <p class="subtitle">There is a secret delivery waiting for you... click the envelope to open it</p>
 
-        <button id="openGiftBtn" class="btn-gift" type="button">
-          <span class="btn-text">Open Your Gift</span>
-          <span class="btn-icon">💌</span>
-        </button>
-        <p class="hint-text">Click to unwrap your birthday surprise</p>
-      </div>
-    </div>
-  </header>
-
-  <!-- MAIN EXPERIENCE CONTAINER (Revealed on Open) -->
-  <div id="mainExperience" class="main-experience">
-
-    <!-- ========================================================
-         SECTION B: THE BIRTHDAY CELEBRATION (Hero)
-    ======================================================== -->
-    <section id="celebration" class="section celebration-section">
-      <div class="container text-center">
-        <div class="decorative-crown">👑</div>
-        <p class="tagline">Today is celebrating the woman who gave me everything</p>
-        <h2 class="hero-title glowing-text">Happy Birthday, Mom! <span class="heart-pulse">❤️</span></h2>
-        
-        <p class="hero-intro">
-          Today is all about you — your kindness, your laughter, your unconditional love, 
-          and every quiet sacrifice you've ever made. I made this website just for you 
-          so you'll never forget how cherished and deeply loved you truly are.
-        </p>
-
-        <!-- Hero Photo Frame with Fallback -->
-        <div class="hero-photo-wrapper">
-          <div class="hero-photo-frame">
-            <img 
-              id="heroPhoto" 
-              src="images/hero.jpg" 
-              alt="Mom's Beautiful Portrait" 
-              class="hero-img"
-              onerror="this.onerror=null; this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'600\' height=\'400\' viewBox=\'0 0 600 400\'><defs><linearGradient id=\'g\' x1=\'0%\' y1=\'0%\' x2=\'100%\' y2=\'100%\'><stop offset=\'0%\' stop-color=\'%23FDE8EE\'/><stop offset=\'100%\' stop-color=\'%23F7C5D0\'/></linearGradient></defs><rect width=\'100%\' height=\'100%\' fill=\'url(%23g)\'/><circle cx=\'300\' cy=\'170\' r=\'65\' fill=\'%23D4687A\' opacity=\'0.2\'/><path d=\'M300 135 C280 100, 240 120, 240 155 C240 190, 300 230, 300 240 C300 230, 360 190, 360 155 C360 120, 320 100, 300 135 Z\' fill=\'%23D4687A\'/><text x=\'300\' y=\'290\' font-family=\'serif\' font-size=\'24\' fill=\'%234A3540\' text-anchor=\'middle\' font-weight=\'bold\'>Our Beautiful Mom</text><text x=\'300\' y=\'325\' font-family=\'sans-serif\' font-size=\'15\' fill=\'%237A6570\' text-anchor=\'middle\'>Add your photo into images/hero.jpg</text></svg>';"
-            />
-            <div class="photo-caption-ribbon">
-              <span>Our Queen & Biggest Blessing ✨</span>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- ========================================================
-         SECTION C: OUR MEMORIES (Polaroid Gallery & Lightbox)
-    ======================================================== -->
-    <section id="memories" class="section memories-section">
-      <div class="container">
-        <div class="section-header text-center">
-          <span class="section-subtitle">Moments Frozen in Time</span>
-          <h2 class="section-title">Treasured Memories With You</h2>
-          <div class="divider-floral">🌸 • 🌿 • 🌸</div>
-          <p class="section-desc">Click any picture to look back at our favorite moments together.</p>
-        </div>
-
-        <div class="polaroid-grid" id="polaroidGrid">
-          <!-- Polaroid 1 -->
-          <div class="polaroid-item" data-index="0" data-caption="Your smile brightens even the coldest days" data-date="Special Moment">
-            <div class="polaroid-card">
-              <div class="tape-strip"></div>
-              <div class="photo-holder">
-                <img src="images/photo-1.jpg" alt="Memory with Mom 1" class="gallery-img"
-                  onerror="this.onerror=null; this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'350\' height=\'350\' viewBox=\'0 0 350 350\'><rect width=\'100%\' height=\'100%\' fill=\'%23FFF3F6\'/><text x=\'175\' y=\'160\' font-size=\'45\' text-anchor=\'middle\'>🌸</text><text x=\'175\' y=\'210\' font-family=\'serif\' font-size=\'18\' fill=\'%23B85567\' text-anchor=\'middle\'>Photo 1</text><text x=\'175\' y=\'240\' font-family=\'sans-serif\' font-size=\'12\' fill=\'%239E8A95\' text-anchor=\'middle\'>Drop photo-1.jpg in images/</text></svg>';"
-                />
-              </div>
-              <div class="polaroid-caption">
-                <p class="caption-text">Your smile brightens even the coldest days</p>
-                <span class="caption-date">Always Cherished</span>
-              </div>
-            </div>
-          </div>
-
-          <!-- Polaroid 2 -->
-          <div class="polaroid-item" data-index="1" data-caption="All the warm laughter around our family table" data-date="Favorite Memory">
-            <div class="polaroid-card">
-              <div class="tape-strip"></div>
-              <div class="photo-holder">
-                <img src="images/photo-2.jpg" alt="Memory with Mom 2" class="gallery-img"
-                  onerror="this.onerror=null; this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'350\' height=\'350\' viewBox=\'0 0 350 350\'><rect width=\'100%\' height=\'100%\' fill=\'%23FFF8EF\'/><text x=\'175\' y=\'160\' font-size=\'45\' text-anchor=\'middle\'>✨</text><text x=\'175\' y=\'210\' font-family=\'serif\' font-size=\'18\' fill=\'%23B85567\' text-anchor=\'middle\'>Photo 2</text><text x=\'175\' y=\'240\' font-family=\'sans-serif\' font-size=\'12\' fill=\'%239E8A95\' text-anchor=\'middle\'>Drop photo-2.jpg in images/</text></svg>';"
-                />
-              </div>
-              <div class="polaroid-caption">
-                <p class="caption-text">All the warm laughter around our family table</p>
-                <span class="caption-date">Pure Joy</span>
-              </div>
-            </div>
-          </div>
-
-          <!-- Polaroid 3 -->
-          <div class="polaroid-item" data-index="2" data-caption="Your comforting hugs that make everything okay" data-date="Warmth">
-            <div class="polaroid-card">
-              <div class="tape-strip"></div>
-              <div class="photo-holder">
-                <img src="images/photo-3.jpg" alt="Memory with Mom 3" class="gallery-img"
-                  onerror="this.onerror=null; this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'350\' height=\'350\' viewBox=\'0 0 350 350\'><rect width=\'100%\' height=\'100%\' fill=\'%23FDE8EE\'/><text x=\'175\' y=\'160\' font-size=\'45\' text-anchor=\'middle\'>🌷</text><text x=\'175\' y=\'210\' font-family=\'serif\' font-size=\'18\' fill=\'%23B85567\' text-anchor=\'middle\'>Photo 3</text><text x=\'175\' y=\'240\' font-family=\'sans-serif\' font-size=\'12\' fill=\'%239E8A95\' text-anchor=\'middle\'>Drop photo-3.jpg in images/</text></svg>';"
-                />
-              </div>
-              <div class="polaroid-caption">
-                <p class="caption-text">Your comforting hugs that make everything okay</p>
-                <span class="caption-date">Safe Harbor</span>
-              </div>
-            </div>
-          </div>
-
-          <!-- Polaroid 4 -->
-          <div class="polaroid-item" data-index="3" data-caption="Adventures and travels where we laughed until our stomachs hurt" data-date="Adventures">
-            <div class="polaroid-card">
-              <div class="tape-strip"></div>
-              <div class="photo-holder">
-                <img src="images/photo-4.jpg" alt="Memory with Mom 4" class="gallery-img"
-                  onerror="this.onerror=null; this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'350\' height=\'350\' viewBox=\'0 0 350 350\'><rect width=\'100%\' height=\'100%\' fill=\'%23FFF8EF\'/><text x=\'175\' y=\'160\' font-size=\'45\' text-anchor=\'middle\'>☀️</text><text x=\'175\' y=\'210\' font-family=\'serif\' font-size=\'18\' fill=\'%23B85567\' text-anchor=\'middle\'>Photo 4</text><text x=\'175\' y=\'240\' font-family=\'sans-serif\' font-size=\'12\' fill=\'%239E8A95\' text-anchor=\'middle\'>Drop photo-4.jpg in images/</text></svg>';"
-                />
-              </div>
-              <div class="polaroid-caption">
-                <p class="caption-text">Adventures where we laughed until our stomachs hurt</p>
-                <span class="caption-date">Sweet Times</span>
-              </div>
-            </div>
-          </div>
-
-          <!-- Polaroid 5 -->
-          <div class="polaroid-item" data-index="4" data-caption="Standing proudly by my side at every milestone" data-date="Pride & Joy">
-            <div class="polaroid-card">
-              <div class="tape-strip"></div>
-              <div class="photo-holder">
-                <img src="images/photo-5.jpg" alt="Memory with Mom 5" class="gallery-img"
-                  onerror="this.onerror=null; this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'350\' height=\'350\' viewBox=\'0 0 350 350\'><rect width=\'100%\' height=\'100%\' fill=\'%23FFF3F6\'/><text x=\'175\' y=\'160\' font-size=\'45\' text-anchor=\'middle\'>💐</text><text x=\'175\' y=\'210\' font-family=\'serif\' font-size=\'18\' fill=\'%23B85567\' text-anchor=\'middle\'>Photo 5</text><text x=\'175\' y=\'240\' font-family=\'sans-serif\' font-size=\'12\' fill=\'%239E8A95\' text-anchor=\'middle\'>Drop photo-5.jpg in images/</text></svg>';"
-                />
-              </div>
-              <div class="polaroid-caption">
-                <p class="caption-text">Standing proudly by my side at every milestone</p>
-                <span class="caption-date">Always There</span>
-              </div>
-            </div>
-          </div>
-
-          <!-- Polaroid 6 -->
-          <div class="polaroid-item" data-index="5" data-caption="Every quiet cup of tea and heart-to-heart conversation" data-date="Priceless">
-            <div class="polaroid-card">
-              <div class="tape-strip"></div>
-              <div class="photo-holder">
-                <img src="images/photo-6.jpg" alt="Memory with Mom 6" class="gallery-img"
-                  onerror="this.onerror=null; this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'350\' height=\'350\' viewBox=\'0 0 350 350\'><rect width=\'100%\' height=\'100%\' fill=\'%23FDE8EE\'/><text x=\'175\' y=\'160\' font-size=\'45\' text-anchor=\'middle\'>☕</text><text x=\'175\' y=\'210\' font-family=\'serif\' font-size=\'18\' fill=\'%23B85567\' text-anchor=\'middle\'>Photo 6</text><text x=\'175\' y=\'240\' font-family=\'sans-serif\' font-size=\'12\' fill=\'%239E8A95\' text-anchor=\'middle\'>Drop photo-6.jpg in images/</text></svg>';"
-                />
-              </div>
-              <div class="polaroid-caption">
-                <p class="caption-text">Every quiet cup of tea and heart-to-heart conversation</p>
-                <span class="caption-date">Forever In My Heart</span>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- LIGHTBOX MODAL -->
-    <div id="lightboxModal" class="lightbox-modal" aria-hidden="true" role="dialog" aria-label="Photo Lightbox">
-      <div class="lightbox-backdrop"></div>
-      <div class="lightbox-content">
-        <button id="lightboxClose" class="lightbox-close-btn" aria-label="Close dialog">&times;</button>
-        <button id="lightboxPrev" class="lightbox-nav-btn prev" aria-label="Previous image">&#10094;</button>
-        <div class="lightbox-img-wrapper">
-          <img id="lightboxImg" src="" alt="Enlarged photo" />
-          <div class="lightbox-caption-box">
-            <p id="lightboxCaption" class="lightbox-caption"></p>
-            <span id="lightboxDate" class="lightbox-date"></span>
-          </div>
-        </div>
-        <button id="lightboxNext" class="lightbox-nav-btn next" aria-label="Next image">&#10095;</button>
-      </div>
-    </div>
-
-    <!-- ========================================================
-         SECTION D: REASONS YOU'RE SPECIAL
-    ======================================================== -->
-    <section id="reasons" class="section reasons-section">
-      <div class="container">
-        <div class="section-header text-center">
-          <span class="section-subtitle">A Few of a Million Reasons</span>
-          <h2 class="section-title">Things I Love About You</h2>
-          <div class="divider-floral">💖 • ✨ • 💖</div>
-          <p class="section-desc">There aren't enough words, but here are just a few reasons why you are the best mom on earth.</p>
-        </div>
-
-        <div class="reasons-grid">
-          <!-- Card 1 -->
-          <div class="reason-card">
-            <div class="reason-icon-wrapper">
-              <span class="reason-icon">☀️</span>
-            </div>
-            <h3 class="reason-title">Your Infinite Warmth</h3>
-            <p class="reason-text">
-              No matter what the world feels like outside, walking into your presence always feels like coming home. 
-              You have the rarest gift of making everyone feel seen, embraced, and genuinely cared for.
-            </p>
-          </div>
-
-          <!-- Card 2 -->
-          <div class="reason-card">
-            <div class="reason-icon-wrapper">
-              <span class="reason-icon">🛡️</span>
-            </div>
-            <h3 class="reason-title">Your Quiet Strength</h3>
-            <p class="reason-text">
-              You handle life's hardest storms with unmatched grace and resilience. 
-              Watching how bravely and gently you carry our family has taught me what real strength truly means.
-            </p>
-          </div>
-
-          <!-- Card 3 -->
-          <div class="reason-card">
-            <div class="reason-icon-wrapper">
-              <span class="reason-icon">🌱</span>
-            </div>
-            <h3 class="reason-title">Your Selfless Sacrifices</h3>
-            <p class="reason-text">
-              You have put my happiness, dreams, and comfort above your own a thousand times without ever asking for recognition. 
-              I notice every single one, and I will be grateful for the rest of my days.
-            </p>
-          </div>
-
-          <!-- Card 4 -->
-          <div class="reason-card">
-            <div class="reason-icon-wrapper">
-              <span class="reason-icon">💫</span>
-            </div>
-            <h3 class="reason-title">Your Unconditional Love</h3>
-            <p class="reason-text">
-              Your love doesn't depend on perfection. You believe in me even when I doubt myself, 
-              giving me the confidence to stand tall and pursue whatever lies ahead.
-            </p>
-          </div>
-
-          <!-- Card 5 -->
-          <div class="reason-card">
-            <div class="reason-icon-wrapper">
-              <span class="reason-icon">📖</span>
-            </div>
-            <h3 class="reason-title">Your Gentle Wisdom</h3>
-            <p class="reason-text">
-              Whenever I am lost or overwhelmed, your calm words and perspective guide me back to peace. 
-              Your advice is the compass that guides my most important life choices.
-            </p>
-          </div>
-
-          <!-- Card 6 -->
-          <div class="reason-card">
-            <div class="reason-icon-wrapper">
-              <span class="reason-icon">🌸</span>
-            </div>
-            <h3 class="reason-title">Simply Being You</h3>
-            <p class="reason-text">
-              Your laugh, your sense of humor, your delicious food, and the spark you bring into our lives. 
-              The world is infinitely brighter and warmer simply because you are in it.
-            </p>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- ========================================================
-         SECTION E: A PERSONAL LETTER (Unfolding Stationery)
-    ======================================================== -->
-    <section id="letter" class="section letter-section">
-      <div class="container">
-        <div class="section-header text-center">
-          <span class="section-subtitle">Written Straight From the Heart</span>
-          <h2 class="section-title">A Letter From My Heart</h2>
-          <div class="divider-floral">💌 • 🌹 • 💌</div>
-        </div>
-
-        <div class="letter-parchment-wrapper">
-          <div class="letter-parchment" id="parchmentLetter">
-            <div class="letter-top-accent">
-              <span class="seal-icon">🕊️</span>
-              <span class="letter-date" id="letterDate">On Your Special Day</span>
-            </div>
-
-            <div class="letter-salutation">
-              Dearest Mom,
-            </div>
-
-            <div class="letter-body">
-              <p>
-                I am not always the best at saying everything I feel out loud, so I wrote it down here where I could take my time and express it just right.
-              </p>
-              
-              <p>
-                When I look back at my life, the warmest memories are painted with your smile. Every time I was sick, scared, or uncertain, you were the steady anchor that held me safe. You gave me roots so I would always know where home is, and wings so I could fly towards my dreams.
-              </p>
-
-              <div class="editable-highlight-box">
-                <span class="box-tag">Personal Note:</span>
-                <p>
-                  "Thank you for every meal cooked with love, every bedtime story, every warm hug at the front door, and every silent prayer you whispered for me. I wouldn't be half the person I am today without your guiding light."
-                </p>
-              </div>
-
-              <p>
-                My only wish for you today is that you feel even a tiny fraction of the joy, peace, and warmth you bring to everyone else every single day. You deserve the best this world has to offer — good health, pure happiness, and countless reasons to smile.
-              </p>
-
-              <p class="letter-closing">
-                Happy Birthday, Mom. I love you more than words will ever be able to hold.
-              </p>
-            </div>
-
-            <div class="letter-signature">
-              <p class="signature-line">Forever your child,</p>
-              <p class="signature-name">With all my love ❤️</p>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- ========================================================
-         SECTION F: A BIRTHDAY WISH (Interactive Cake & Candles)
-    ======================================================== -->
-    <section id="wish" class="section wish-section">
-      <div class="container text-center">
-        <div class="section-header">
-          <span class="section-subtitle">Close Your Eyes & Dream Big</span>
-          <h2 class="section-title">Make a Wish, Mom! 🎂</h2>
-          <div class="divider-floral">🕯️ • ✨ • 🕯️</div>
-          <p class="section-desc">Take a deep breath, make the most beautiful wish in your heart, then tap the button below!</p>
-        </div>
-
-        <!-- Interactive Animated Birthday Cake -->
-        <div class="cake-stage">
-          <div class="cake-container" id="birthdayCake">
-            <!-- Candles Row -->
-            <div class="candles-row" id="candlesRow">
-              <div class="candle">
-                <div class="flame flame-1"></div>
-                <div class="wick"></div>
-                <div class="candle-body gold-stripe"></div>
-              </div>
-              <div class="candle">
-                <div class="flame flame-2"></div>
-                <div class="wick"></div>
-                <div class="candle-body rose-stripe"></div>
-              </div>
-              <div class="candle center-candle">
-                <div class="flame flame-3"></div>
-                <div class="wick"></div>
-                <div class="candle-body gold-stripe"></div>
-              </div>
-              <div class="candle">
-                <div class="flame flame-4"></div>
-                <div class="wick"></div>
-                <div class="candle-body rose-stripe"></div>
-              </div>
-              <div class="candle">
-                <div class="flame flame-5"></div>
-                <div class="wick"></div>
-                <div class="candle-body gold-stripe"></div>
-              </div>
-            </div>
-
-            <!-- Cake Tiers -->
-            <div class="cake-tier tier-top">
-              <div class="frosting-drips">
-                <span></span><span></span><span></span><span></span><span></span>
-              </div>
-              <div class="strawberries">🍓 🍓 🍓</div>
-            </div>
-            <div class="cake-tier tier-middle">
-              <div class="cream-decorations">
-                <span>✦</span><span>✦</span><span>✦</span><span>✦</span>
-              </div>
-            </div>
-            <div class="cake-tier tier-bottom">
-              <div class="gold-ribbon"></div>
-            </div>
-            <div class="cake-plate"></div>
-          </div>
-        </div>
-
-        <!-- Wish Interactive Trigger -->
-        <div class="wish-action-area">
-          <button id="blowCandlesBtn" class="btn-wish" type="button">
-            <span class="wish-btn-text">Blow Out Candles & Make a Wish 🎂</span>
+      <!-- 3D Realistic Envelope (الظرف) -->
+      <div class="envelope-scene">
+        <div class="envelope-box" id="envelopeBox">
+          <div class="envelope-flap" id="envelopeFlap"></div>
+          <div class="envelope-pocket"></div>
+          
+          <!-- Wax Seal -->
+          <button id="waxSealBtn" class="wax-seal" type="button" aria-label="Break seal to open envelope">
+            <span class="seal-heart">❤️</span>
+            <span class="seal-text">MOM</span>
           </button>
-        </div>
 
-        <!-- Hidden Wish Reveal Message -->
-        <div id="wishRevealedCard" class="wish-revealed-card hidden">
-          <div class="sparkle-burst">🎉 💖 🌟 🎊</div>
-          <h3 class="wish-granted-title">May All Your Dreams Come True!</h3>
-          <p class="wish-granted-body">
-            May this upcoming year be filled with radiant health, gentle peace, deep laughter, 
-            and days as sweet and wonderful as you make ours. We love you so much!
-          </p>
-        </div>
-      </div>
-    </section>
-
-    <!-- ========================================================
-         SECTION G: THE FINAL SURPRISE (Emotional Closing)
-    ======================================================== -->
-    <section id="final" class="section final-section">
-      <div class="final-overlay"></div>
-      <div class="container text-center relative-z">
-        
-        <div class="final-photo-container">
-          <div class="final-photo-frame">
-            <img 
-              src="images/final.jpg" 
-              alt="Mom Always in My Heart" 
-              class="final-img"
-              onerror="this.onerror=null; this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'300\' height=\'300\' viewBox=\'0 0 300 300\'><circle cx=\'150\' cy=\'150\' r=\'145\' fill=\'%23FFF0F5\' stroke=\'%23D4687A\' stroke-width=\'4\'/><text x=\'150\' y=\'140\' font-size=\'50\' text-anchor=\'middle\'>💖</text><text x=\'150\' y=\'190\' font-family=\'serif\' font-size=\'20\' fill=\'%23B85567\' font-weight=\'bold\' text-anchor=\'middle\'>Always & Forever</text></svg>';"
-            />
+          <!-- Letter Card that pops out -->
+          <div class="letter-card" id="letterCard">
+            <div class="letter-inner">
+              <span class="letter-stamp">👑</span>
+              <h3>To the Queen of Our Hearts</h3>
+              <p>You mean the entire world to us. Let's see what's inside...</p>
+              <span class="click-hint">Tap here to proceed ✨</span>
+            </div>
           </div>
         </div>
+      </div>
 
-        <div class="floating-hearts-container" id="floatingHeartsContainer"></div>
+      <p class="envelope-instruction">Click the envelope or the wax seal to unwrap (افتحي الظرف) 💌</p>
+    </div>
+  </main>
 
-        <p class="final-quote">
-          "Whatever life brings, I hope you always know how loved you are."
-        </p>
+  <!-- ========================================================
+       STAGE 2: THE PLAYFUL PRANK & SCROLLING MEMORIES
+  ======================================================== -->
+  <main id="stage2" class="stage">
+    <div class="stage-container text-center">
+      <div class="stage-badge">🎁 Step 2: Your Choice 🎁</div>
+      <h2 class="section-title">Do You Want Your Birthday Gift, Mom?</h2>
+      <p class="subtitle">Please make your choice below (Be careful what you choose! 😜)</p>
 
-        <h2 class="final-signature glowing-rose">
-          I love you, Mom. Happy Birthday! ❤️
-        </h2>
+      <!-- Buttons Arena -->
+      <div class="choice-arena" id="choiceArena">
+        <!-- The Real Gift Button -->
+        <button id="wantGiftBtn" class="btn-primary-gift" type="button">
+          <span class="gift-icon">🎁</span>
+          <span>I Want My Gift! ❤️</span>
+        </button>
 
-        <div class="footer-wrapper">
-          <p class="footer-note">Made with all my love, just for you.</p>
-          <span class="infinity-symbol">∞</span>
+        <!-- The Runaway / Dodging Prank Button -->
+        <button id="dontWantBtn" class="btn-runaway" type="button">
+          <span>I don't want a gift 🙈</span>
+        </button>
+      </div>
+
+      <p id="prankTeaseText" class="prank-tease">Try catching the second button if you dare! 😂</p>
+
+      <!-- Horizontal Continuous Memories Scroll Ribbon -->
+      <div class="memories-stream-wrapper">
+        <div class="stream-header">
+          <span>🌸 Precious Moments With You 🌸</span>
+        </div>
+        <div class="memories-track" id="memoriesTrack">
+          <!-- Duplicate cards for smooth infinity loop -->
+          <div class="memory-pill">
+            <img src="images/photo-1.jpg" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'100\' height=\'100\'><rect fill=\'%23FDE8EE\' width=\'100\' height=\'100\'/><text x=\'50\' y=\'58\' font-size=\'30\' text-anchor=\'middle\'>🌸</text></svg>';" alt="Memory 1">
+            <span>Your warm smile</span>
+          </div>
+          <div class="memory-pill">
+            <img src="images/photo-2.jpg" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'100\' height=\'100\'><rect fill=\'%23FFF8EF\' width=\'100\' height=\'100\'/><text x=\'50\' y=\'58\' font-size=\'30\' text-anchor=\'middle\'>✨</text></svg>';" alt="Memory 2">
+            <span>Endless laughter</span>
+          </div>
+          <div class="memory-pill">
+            <img src="images/photo-3.jpg" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'100\' height=\'100\'><rect fill=\'%23FDE8EE\' width=\'100\' height=\'100\'/><text x=\'50\' y=\'58\' font-size=\'30\' text-anchor=\'middle\'>🌷</text></svg>';" alt="Memory 3">
+            <span>Your loving hugs</span>
+          </div>
+          <div class="memory-pill">
+            <img src="images/photo-4.jpg" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'100\' height=\'100\'><rect fill=\'%23FFF8EF\' width=\'100\' height=\'100\'/><text x=\'50\' y=\'58\' font-size=\'30\' text-anchor=\'middle\'>☀️</text></svg>';" alt="Memory 4">
+            <span>Sweet adventures</span>
+          </div>
+          <div class="memory-pill">
+            <img src="images/photo-5.jpg" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'100\' height=\'100\'><rect fill=\'%23FDE8EE\' width=\'100\' height=\'100\'/><text x=\'50\' y=\'58\' font-size=\'30\' text-anchor=\'middle\'>💖</text></svg>';" alt="Memory 5">
+            <span>Always by my side</span>
+          </div>
+          <!-- Repeat items for seamless animation -->
+          <div class="memory-pill">
+            <img src="images/photo-1.jpg" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'100\' height=\'100\'><rect fill=\'%23FDE8EE\' width=\'100\' height=\'100\'/><text x=\'50\' y=\'58\' font-size=\'30\' text-anchor=\'middle\'>🌸</text></svg>';" alt="Memory 1">
+            <span>Your warm smile</span>
+          </div>
+          <div class="memory-pill">
+            <img src="images/photo-2.jpg" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'100\' height=\'100\'><rect fill=\'%23FFF8EF\' width=\'100\' height=\'100\'/><text x=\'50\' y=\'58\' font-size=\'30\' text-anchor=\'middle\'>✨</text></svg>';" alt="Memory 2">
+            <span>Endless laughter</span>
+          </div>
+          <div class="memory-pill">
+            <img src="images/photo-3.jpg" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'100\' height=\'100\'><rect fill=\'%23FDE8EE\' width=\'100\' height=\'100\'/><text x=\'50\' y=\'58\' font-size=\'30\' text-anchor=\'middle\'>🌷</text></svg>';" alt="Memory 3">
+            <span>Your loving hugs</span>
+          </div>
         </div>
       </div>
-    </section>
+    </div>
+  </main>
 
-  </div><!-- /mainExperience -->
+  <!-- ========================================================
+       STAGE 3: THE ULTRA-LUXURY CAKE & SPEEDING ROTATION WARP
+  ======================================================== -->
+  <main id="stage3" class="stage">
+    <div class="stage-container text-center">
+      <div class="stage-badge gold-badge">👑 Royal Birthday Pavilion 👑</div>
+      <h2 class="luxury-title glowing-gold">A Royal Birthday Cake For Queen Mom</h2>
+      <p class="subtitle gold-subtitle">Crafted with pure love, golden frosting, and wishes that shine forever</p>
+
+      <!-- The Cake Arena (Transforms and speeds up rotation upon clicking!) -->
+      <div class="cake-vortex-wrapper" id="cakeVortexWrapper">
+        <div class="luxury-cake-stage" id="luxuryCakeStage">
+          <!-- Candles Layer -->
+          <div class="royal-candles">
+            <div class="royal-candle c1">
+              <div class="flame-halo"></div>
+              <div class="flame"></div>
+              <div class="candle-stem gold-bar"></div>
+            </div>
+            <div class="royal-candle c2">
+              <div class="flame-halo"></div>
+              <div class="flame"></div>
+              <div class="candle-stem rose-bar"></div>
+            </div>
+            <div class="royal-candle center-candle">
+              <div class="crown-mini">👑</div>
+              <div class="flame-halo"></div>
+              <div class="flame big-flame"></div>
+              <div class="candle-stem gold-bar"></div>
+            </div>
+            <div class="royal-candle c4">
+              <div class="flame-halo"></div>
+              <div class="flame"></div>
+              <div class="candle-stem rose-bar"></div>
+            </div>
+            <div class="royal-candle c5">
+              <div class="flame-halo"></div>
+              <div class="flame"></div>
+              <div class="candle-stem gold-bar"></div>
+            </div>
+          </div>
+
+          <!-- 3-Tier Luxury Cake -->
+          <div class="cake-tiers-wrapper">
+            <div class="tier tier-1">
+              <div class="pearls-garland">✦ ✦ ✦ ✦</div>
+              <div class="gold-frosting-drop"></div>
+            </div>
+            <div class="tier tier-2">
+              <div class="velvet-lace"></div>
+              <span class="tier-tag">HAPPY BIRTHDAY MOM</span>
+            </div>
+            <div class="tier tier-3">
+              <div class="gold-base-filigree"></div>
+            </div>
+            <div class="royal-pedestal"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Action Button to Trigger Speeding Rotation Warp -->
+      <div class="warp-action-box">
+        <button id="lightCandlesBtn" class="btn-royal-light" type="button">
+          <span class="btn-sparkle">✨</span>
+          <span>Light Up The Candles & Enter the Dream 🎂</span>
+          <span class="btn-sparkle">✨</span>
+        </button>
+        <p class="warp-instruction">Click to ignite the magic and accelerate into the grand surprise!</p>
+      </div>
+    </div>
+  </main>
+
+  <!-- ========================================================
+       STAGE 4: THE GRAND FINALE WITH 3D HORIZONTAL ROTATING GALLERY
+  ======================================================== -->
+  <main id="stage4" class="stage">
+    <div class="stage-container text-center">
+      <div class="stage-badge">🌟 The Grand Celebration 🌟</div>
+      <h2 class="finale-title glowing-rose">Happy Birthday, Mom! ❤️</h2>
+      <p class="subtitle">A 3D gallery of your smiles floating forever from left to right</p>
+
+      <!-- 3D Horizontal Rotating Image Carousel (Carousel moves left to right) -->
+      <div class="carousel-3d-wrapper">
+        <div class="carousel-3d" id="carousel3D">
+          <!-- 8 3D Gallery Panels -->
+          <div class="carousel-panel" style="--i:0;">
+            <div class="panel-card">
+              <img src="images/photo-1.jpg" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'250\' height=\'250\'><rect fill=\'%23FDE8EE\' width=\'250\' height=\'250\'/><text x=\'125\' y=\'130\' font-size=\'40\' text-anchor=\'middle\'>🌸</text></svg>';" alt="Mom Photo 1">
+              <span class="panel-caption">Your Radiant Smile</span>
+            </div>
+          </div>
+          <div class="carousel-panel" style="--i:1;">
+            <div class="panel-card">
+              <img src="images/photo-2.jpg" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'250\' height=\'250\'><rect fill=\'%23FFF8EF\' width=\'250\' height=\'250\'/><text x=\'125\' y=\'130\' font-size=\'40\' text-anchor=\'middle\'>✨</text></svg>';" alt="Mom Photo 2">
+              <span class="panel-caption">Warmest Hugs</span>
+            </div>
+          </div>
+          <div class="carousel-panel" style="--i:2;">
+            <div class="panel-card">
+              <img src="images/photo-3.jpg" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'250\' height=\'250\'><rect fill=\'%23FDE8EE\' width=\'250\' height=\'250\'/><text x=\'125\' y=\'130\' font-size=\'40\' text-anchor=\'middle\'>🌷</text></svg>';" alt="Mom Photo 3">
+              <span class="panel-caption">Pure Kindness</span>
+            </div>
+          </div>
+          <div class="carousel-panel" style="--i:3;">
+            <div class="panel-card">
+              <img src="images/photo-4.jpg" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'250\' height=\'250\'><rect fill=\'%23FFF8EF\' width=\'250\' height=\'250\'/><text x=\'125\' y=\'130\' font-size=\'40\' text-anchor=\'middle\'>☀️</text></svg>';" alt="Mom Photo 4">
+              <span class="panel-caption">Sweetest Memories</span>
+            </div>
+          </div>
+          <div class="carousel-panel" style="--i:4;">
+            <div class="panel-card">
+              <img src="images/photo-5.jpg" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'250\' height=\'250\'><rect fill=\'%23FDE8EE\' width=\'250\' height=\'250\'/><text x=\'125\' y=\'130\' font-size=\'40\' text-anchor=\'middle\'>💖</text></svg>';" alt="Mom Photo 5">
+              <span class="panel-caption">Quiet Strength</span>
+            </div>
+          </div>
+          <div class="carousel-panel" style="--i:5;">
+            <div class="panel-card">
+              <img src="images/photo-6.jpg" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'250\' height=\'250\'><rect fill=\'%23FFF8EF\' width=\'250\' height=\'250\'/><text x=\'125\' y=\'130\' font-size=\'40\' text-anchor=\'middle\'>☕</text></svg>';" alt="Mom Photo 6">
+              <span class="panel-caption">Heart-to-Heart</span>
+            </div>
+          </div>
+          <div class="carousel-panel" style="--i:6;">
+            <div class="panel-card">
+              <img src="images/hero.jpg" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'250\' height=\'250\'><rect fill=\'%23FDE8EE\' width=\'250\' height=\'250\'/><text x=\'125\' y=\'130\' font-size=\'40\' text-anchor=\'middle\'>👑</text></svg>';" alt="Mom Photo 7">
+              <span class="panel-caption">Our Queen Forever</span>
+            </div>
+          </div>
+          <div class="carousel-panel" style="--i:7;">
+            <div class="panel-card">
+              <img src="images/final.jpg" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'250\' height=\'250\'><rect fill=\'%23FFF8EF\' width=\'250\' height=\'250\'/><text x=\'125\' y=\'130\' font-size=\'40\' text-anchor=\'middle\'>💐</text></svg>';" alt="Mom Photo 8">
+              <span class="panel-caption">Always Loved</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Controls to pause / change speed of 3D gallery -->
+      <div class="carousel-controls">
+        <button id="toggleCarouselBtn" class="btn-pill" type="button">⏸ Pause Rotation</button>
+      </div>
+
+      <!-- The Grand Heartfelt Letter -->
+      <div class="final-letter-card">
+        <div class="letter-filigree">🕊️ • 💌 • 🕊️</div>
+        <h3 class="letter-heading">Dearest Mom,</h3>
+        <p class="letter-paragraph">
+          If I could gather every flower in the world, it still wouldn't be enough to thank you for everything you have done for me. 
+          Through every step of my life, your love has been my shield, your wisdom my compass, and your warm embrace my sanctuary.
+        </p>
+        <p class="letter-paragraph">
+          I hope today brings you as much joy, peace, and warmth as you have poured into our family every single day.
+        </p>
+        <div class="highlight-quote">
+          "Whatever life brings, I hope you always know how deeply and endlessly loved you are."
+        </div>
+        <div class="letter-closing">
+          <p>Forever your child,</p>
+          <p class="signature-script">With all my love, always & forever ❤️</p>
+        </div>
+      </div>
+
+      <!-- Replay Journey Button -->
+      <div class="replay-box">
+        <button id="replayBtn" class="btn-replay" type="button">
+          <span>🔄 Experience the Magic Again</span>
+        </button>
+      </div>
+    </div>
+  </main>
 
   <script src="script.js"></script>
 </body>

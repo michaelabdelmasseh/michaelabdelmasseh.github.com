@@ -1,42 +1,280 @@
 /**
  * ========================================================
- *  MOM'S BIRTHDAY WEBSITE — INTERACTION & ANIMATIONS
- *  Pure Vanilla JavaScript (No dependencies required)
+ *  MOM'S BIRTHDAY WEBSITE — MULTI-STAGE CONTROLLER
+ *  Envelope (الظرف) -> Prank Choice -> Luxury Cake Spin Warp -> 3D Horizontal Carousel
  * ========================================================
  */
 
 document.addEventListener('DOMContentLoaded', () => {
 
   // --------------------------------------------------------
-  // 1. OPEN GIFT / UNWRAP EXPERIENCE
+  // WEB AUDIO SOUND EFFECTS (No external files needed)
   // --------------------------------------------------------
-  const openGiftBtn = document.getElementById('openGiftBtn');
-  const welcomeScreen = document.getElementById('welcome');
-  const mainExperience = document.getElementById('mainExperience');
+  let audioCtx = null;
+  function getAudioContext() {
+    if (!audioCtx) {
+      audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    }
+    return audioCtx;
+  }
 
-  if (openGiftBtn && welcomeScreen && mainExperience) {
-    openGiftBtn.addEventListener('click', () => {
-      welcomeScreen.classList.add('opened');
-      mainExperience.classList.add('visible');
+  function playChime() {
+    try {
+      const ctx = getAudioContext();
+      if (ctx.state === 'suspended') ctx.resume();
+      const notes = [523.25, 659.25, 783.99, 1046.50]; // C5, E5, G5, C6
+      notes.forEach((freq, idx) => {
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(freq, ctx.currentTime + idx * 0.1);
+        gain.gain.setValueAtTime(0, ctx.currentTime + idx * 0.1);
+        gain.gain.linearRampToValueAtTime(0.18, ctx.currentTime + idx * 0.1 + 0.04);
+        gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + idx * 0.1 + 1.2);
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.start(ctx.currentTime + idx * 0.1);
+        osc.stop(ctx.currentTime + idx * 0.1 + 1.25);
+      });
+    } catch (e) {}
+  }
 
-      // Trigger celebration confetti
-      fireConfetti(120);
-      playChime();
+  function playDodgeSound() {
+    try {
+      const ctx = getAudioContext();
+      if (ctx.state === 'suspended') ctx.resume();
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = 'triangle';
+      osc.frequency.setValueAtTime(300, ctx.currentTime);
+      osc.frequency.exponentialRampToValueAtTime(650, ctx.currentTime + 0.18);
+      gain.gain.setValueAtTime(0.12, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.2);
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start();
+      osc.stop(ctx.currentTime + 0.2);
+    } catch (e) {}
+  }
 
-      // Smooth scroll to celebration hero
+  function playWarpSound() {
+    try {
+      const ctx = getAudioContext();
+      if (ctx.state === 'suspended') ctx.resume();
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = 'sawtooth';
+      osc.frequency.setValueAtTime(150, ctx.currentTime);
+      // Sweeping frequency that rises as it speeds up
+      osc.frequency.exponentialRampToValueAtTime(1400, ctx.currentTime + 2.4);
+      gain.gain.setValueAtTime(0.05, ctx.currentTime);
+      gain.gain.linearRampToValueAtTime(0.22, ctx.currentTime + 1.8);
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 2.6);
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start();
+      osc.stop(ctx.currentTime + 2.7);
+    } catch (e) {}
+  }
+
+  // --------------------------------------------------------
+  // STAGE CONTROLLER WITH TELEPORT FLASH
+  // --------------------------------------------------------
+  const stages = {
+    stage1: document.getElementById('stage1'),
+    stage2: document.getElementById('stage2'),
+    stage3: document.getElementById('stage3'),
+    stage4: document.getElementById('stage4')
+  };
+  const flash = document.getElementById('teleportFlash');
+
+  function goToStage(stageId, withFlash = false) {
+    if (withFlash && flash) {
+      flash.classList.add('active');
       setTimeout(() => {
-        const celebrationSection = document.getElementById('celebration');
-        if (celebrationSection) {
-          celebrationSection.scrollIntoView({ behavior: 'smooth' });
-        }
-      }, 350);
+        switchActiveStage(stageId);
+        setTimeout(() => {
+          flash.classList.remove('active');
+        }, 300);
+      }, 400);
+    } else {
+      switchActiveStage(stageId);
+    }
+  }
+
+  function switchActiveStage(stageId) {
+    Object.values(stages).forEach(stage => {
+      if (stage) stage.classList.remove('active');
+    });
+    const target = stages[stageId];
+    if (target) {
+      target.classList.add('active');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  }
+
+  // --------------------------------------------------------
+  // STAGE 1: THE ENVELOPE (الظرف)
+  // --------------------------------------------------------
+  const envelopeBox = document.getElementById('envelopeBox');
+  const waxSealBtn = document.getElementById('waxSealBtn');
+  const letterCard = document.getElementById('letterCard');
+  let envelopeOpened = false;
+
+  function openEnvelope() {
+    if (envelopeOpened) return;
+    envelopeOpened = true;
+    envelopeBox.classList.add('opened');
+    playChime();
+    fireConfetti(60);
+
+    // After brief reveal, teleport to Stage 2 (Choice)
+    setTimeout(() => {
+      goToStage('stage2', true);
+    }, 2000);
+  }
+
+  if (envelopeBox) envelopeBox.addEventListener('click', openEnvelope);
+  if (waxSealBtn) waxSealBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    openEnvelope();
+  });
+  if (letterCard) letterCard.addEventListener('click', (e) => {
+    e.stopPropagation();
+    goToStage('stage2', true);
+  });
+
+  // --------------------------------------------------------
+  // STAGE 2: PRANK CHOICE (RUNAWAY BUTTON & GIFT)
+  // --------------------------------------------------------
+  const wantGiftBtn = document.getElementById('wantGiftBtn');
+  const dontWantBtn = document.getElementById('dontWantBtn');
+  const prankTeaseText = document.getElementById('prankTeaseText');
+
+  const teaseMessages = [
+    "Are you sure, Mom? 😂",
+    "Nope, can't touch this! 🏃‍♀️💨",
+    "Mom, you HAVE to accept this gift! ❤️",
+    "Just give up and click the pink one! 😜",
+    "I won't let you refuse! You deserve the world! 🎁",
+    "Still trying? Just tap 'I Want My Gift'! 🥰"
+  ];
+  let dodgeCount = 0;
+
+  function dodgeButton() {
+    if (!dontWantBtn) return;
+    dontWantBtn.classList.add('dodging');
+    playDodgeSound();
+
+    const btnWidth = dontWantBtn.offsetWidth || 180;
+    const btnHeight = dontWantBtn.offsetHeight || 50;
+    const padding = 30;
+
+    const maxX = window.innerWidth - btnWidth - padding;
+    const maxY = window.innerHeight - btnHeight - padding;
+
+    const randomX = Math.max(padding, Math.floor(Math.random() * maxX));
+    const randomY = Math.max(padding, Math.floor(Math.random() * maxY));
+
+    dontWantBtn.style.left = `${randomX}px`;
+    dontWantBtn.style.top = `${randomY}px`;
+
+    // Update teasing message
+    if (prankTeaseText) {
+      prankTeaseText.textContent = teaseMessages[dodgeCount % teaseMessages.length];
+    }
+    dodgeCount++;
+  }
+
+  if (dontWantBtn) {
+    dontWantBtn.addEventListener('mouseenter', dodgeButton);
+    dontWantBtn.addEventListener('touchstart', (e) => {
+      e.preventDefault();
+      dodgeButton();
+    });
+    dontWantBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      dodgeButton();
+    });
+  }
+
+  if (wantGiftBtn) {
+    wantGiftBtn.addEventListener('click', () => {
+      playChime();
+      fireConfetti(100);
+      // Teleport to Stage 3: The Royal Cake
+      goToStage('stage3', true);
     });
   }
 
   // --------------------------------------------------------
-  // 2. FALLING ROSE PETALS (CANVAS)
+  // STAGE 3: LUXURY CAKE & SPEEDING ROTATION WARP
   // --------------------------------------------------------
-  const petalsCanvas = document.getElementById('petals-canvas');
+  const lightCandlesBtn = document.getElementById('lightCandlesBtn');
+  const cakeVortexWrapper = document.getElementById('cakeVortexWrapper');
+
+  if (lightCandlesBtn && cakeVortexWrapper) {
+    lightCandlesBtn.addEventListener('click', () => {
+      lightCandlesBtn.disabled = true;
+      lightCandlesBtn.innerHTML = '<span>Accelerating into Surprise... ✨</span>';
+
+      // Play rising warp audio
+      playWarpSound();
+
+      // Start the speeding rotation
+      cakeVortexWrapper.classList.add('spinning-warp');
+
+      // Teleport right at the climax of the spin
+      setTimeout(() => {
+        goToStage('stage4', true);
+        fireConfetti(160);
+        cakeVortexWrapper.classList.remove('spinning-warp');
+        lightCandlesBtn.disabled = false;
+        lightCandlesBtn.innerHTML = '<span>✨ Light Up The Candles & Enter the Dream 🎂</span>';
+      }, 2500);
+    });
+  }
+
+  // --------------------------------------------------------
+  // STAGE 4: 3D HORIZONTAL ROTATING CAROUSEL & FINALE
+  // --------------------------------------------------------
+  const carousel3D = document.getElementById('carousel3D');
+  const toggleCarouselBtn = document.getElementById('toggleCarouselBtn');
+  let isCarouselPaused = false;
+
+  if (toggleCarouselBtn && carousel3D) {
+    toggleCarouselBtn.addEventListener('click', () => {
+      isCarouselPaused = !isCarouselPaused;
+      if (isCarouselPaused) {
+        carousel3D.classList.add('paused');
+        toggleCarouselBtn.textContent = '▶ Resume Rotation';
+      } else {
+        carousel3D.classList.remove('paused');
+        toggleCarouselBtn.textContent = '⏸ Pause Rotation';
+      }
+    });
+  }
+
+  // Replay Journey Button
+  const replayBtn = document.getElementById('replayBtn');
+  if (replayBtn) {
+    replayBtn.addEventListener('click', () => {
+      envelopeOpened = false;
+      if (envelopeBox) envelopeBox.classList.remove('opened');
+      if (dontWantBtn) {
+        dontWantBtn.classList.remove('dodging');
+        dontWantBtn.style.left = '';
+        dontWantBtn.style.top = '';
+      }
+      dodgeCount = 0;
+      goToStage('stage1', true);
+    });
+  }
+
+  // --------------------------------------------------------
+  // FALLING ROSE PETALS (CANVAS)
+  // --------------------------------------------------------
+  const petalsCanvas = document.getElementById('petalsCanvas');
   if (petalsCanvas) {
     const ctx = petalsCanvas.getContext('2d');
     let width = (petalsCanvas.width = window.innerWidth);
@@ -48,8 +286,8 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     const petals = [];
-    const petalColors = ['#F7C5D0', '#FDE8EE', '#F3A8B6', '#EBB0BA', '#FFEBF0'];
-    const maxPetals = window.innerWidth < 600 ? 18 : 32;
+    const colors = ['#F7C5D0', '#FDE8EE', '#F3A8B6', '#EBB0BA', '#FFEBF0'];
+    const maxPetals = window.innerWidth < 600 ? 16 : 28;
 
     for (let i = 0; i < maxPetals; i++) {
       petals.push({
@@ -57,23 +295,22 @@ document.addEventListener('DOMContentLoaded', () => {
         y: Math.random() * height - height,
         r: Math.random() * 8 + 6,
         d: Math.random() * maxPetals,
-        color: petalColors[Math.floor(Math.random() * petalColors.length)],
+        color: colors[Math.floor(Math.random() * colors.length)],
         tilt: Math.floor(Math.random() * 10) - 10,
         tiltAngle: 0,
-        tiltAngleIncremental: (Math.random() * 0.07) + 0.04,
-        speedY: (Math.random() * 1.2) + 0.8,
-        speedX: (Math.random() * 1) - 0.5
+        tiltAngleInc: Math.random() * 0.06 + 0.03,
+        speedY: Math.random() * 1.1 + 0.7,
+        speedX: Math.random() * 1 - 0.5
       });
     }
 
     function renderPetals() {
       ctx.clearRect(0, 0, width, height);
-
-      petals.forEach((p) => {
-        p.tiltAngle += p.tiltAngleIncremental;
+      petals.forEach(p => {
+        p.tiltAngle += p.tiltAngleInc;
         p.y += p.speedY;
         p.x += Math.sin(p.d) + p.speedX;
-        p.tilt = Math.sin(p.tiltAngle - (p.d / 3)) * 14;
+        p.tilt = Math.sin(p.tiltAngle - p.d / 3) * 14;
 
         ctx.beginPath();
         ctx.fillStyle = p.color;
@@ -81,29 +318,23 @@ document.addEventListener('DOMContentLoaded', () => {
         ctx.ellipse(p.x, p.y, p.r, p.r * 1.4, (p.tilt * Math.PI) / 180, 0, 2 * Math.PI);
         ctx.fill();
 
-        // Respawn when hitting bottom
         if (p.y > height + 20) {
           p.y = -20;
           p.x = Math.random() * width;
         }
       });
-
       requestAnimationFrame(renderPetals);
     }
-
-    // Only run if user doesn't prefer reduced motion
-    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    if (!prefersReducedMotion) {
-      renderPetals();
-    }
+    renderPetals();
   }
 
   // --------------------------------------------------------
-  // 3. CONFETTI CANNON (PURE CANVAS)
+  // CONFETTI CANNON (CANVAS)
   // --------------------------------------------------------
-  const confettiCanvas = document.getElementById('confetti-canvas');
+  const confettiCanvas = document.getElementById('confettiCanvas');
   let confettiCtx = confettiCanvas ? confettiCanvas.getContext('2d') : null;
   let confettiParticles = [];
+  let isConfettiAnimating = false;
 
   function resizeConfetti() {
     if (confettiCanvas) {
@@ -114,9 +345,9 @@ document.addEventListener('DOMContentLoaded', () => {
   window.addEventListener('resize', resizeConfetti);
   resizeConfetti();
 
-  function fireConfetti(count = 90) {
+  function fireConfetti(count = 100) {
     if (!confettiCanvas || !confettiCtx) return;
-    const colors = ['#D4687A', '#F7C5D0', '#C9A55A', '#F3E5AB', '#FFFDF9', '#E87A90'];
+    const colors = ['#D4687A', '#F7C5D0', '#C9A55A', '#FFD700', '#FFFDF9'];
     const w = confettiCanvas.width;
     const h = confettiCanvas.height;
 
@@ -124,12 +355,12 @@ document.addEventListener('DOMContentLoaded', () => {
       confettiParticles.push({
         x: w / 2 + (Math.random() * 200 - 100),
         y: h / 2 + (Math.random() * 100 - 50),
-        vx: (Math.random() - 0.5) * 16,
-        vy: -Math.random() * 14 - 6,
+        vx: (Math.random() - 0.5) * 18,
+        vy: -Math.random() * 15 - 6,
         size: Math.random() * 8 + 5,
         color: colors[Math.floor(Math.random() * colors.length)],
         rotation: Math.random() * 360,
-        rotationSpeed: (Math.random() - 0.5) * 10,
+        rotSpeed: (Math.random() - 0.5) * 10,
         opacity: 1,
         gravity: 0.35,
         friction: 0.98
@@ -142,7 +373,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  let isConfettiAnimating = false;
   function animateConfetti() {
     if (!confettiCtx || confettiParticles.length === 0) {
       if (confettiCtx) confettiCtx.clearRect(0, 0, confettiCanvas.width, confettiCanvas.height);
@@ -158,8 +388,8 @@ document.addEventListener('DOMContentLoaded', () => {
       p.y += p.vy;
       p.vy += p.gravity;
       p.vx *= p.friction;
-      p.rotation += p.rotationSpeed;
-      p.opacity -= 0.007;
+      p.rotation += p.rotSpeed;
+      p.opacity -= 0.008;
 
       if (p.opacity <= 0 || p.y > confettiCanvas.height + 20) {
         confettiParticles.splice(i, 1);
@@ -171,7 +401,7 @@ document.addEventListener('DOMContentLoaded', () => {
       confettiCtx.rotate((p.rotation * Math.PI) / 180);
       confettiCtx.fillStyle = p.color;
       confettiCtx.globalAlpha = Math.max(0, p.opacity);
-      confettiCtx.fillRect(-p.size / 2, -p.size / 2, p.size, p.size * 1.5);
+      confettiCtx.fillRect(-p.size / 2, -p.size / 2, p.size, p.size * 1.4);
       confettiCtx.restore();
     }
 
@@ -179,168 +409,18 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // --------------------------------------------------------
-  // 4. INTERACTIVE POLAROID GALLERY & LIGHTBOX
-  // --------------------------------------------------------
-  const polaroidItems = Array.from(document.querySelectorAll('.polaroid-item'));
-  const lightbox = document.getElementById('lightboxModal');
-  const lightboxImg = document.getElementById('lightboxImg');
-  const lightboxCaption = document.getElementById('lightboxCaption');
-  const lightboxDate = document.getElementById('lightboxDate');
-  const lightboxClose = document.getElementById('lightboxClose');
-  const lightboxPrev = document.getElementById('lightboxPrev');
-  const lightboxNext = document.getElementById('lightboxNext');
-
-  let currentPhotoIndex = 0;
-
-  function updateLightbox(index) {
-    if (index < 0) index = polaroidItems.length - 1;
-    if (index >= polaroidItems.length) index = 0;
-    currentPhotoIndex = index;
-
-    const item = polaroidItems[index];
-    const img = item.querySelector('img');
-    const caption = item.getAttribute('data-caption') || '';
-    const date = item.getAttribute('data-date') || '';
-
-    if (lightboxImg) lightboxImg.src = img.src;
-    if (lightboxCaption) lightboxCaption.textContent = caption;
-    if (lightboxDate) lightboxDate.textContent = date;
-  }
-
-  polaroidItems.forEach((item, idx) => {
-    item.addEventListener('click', () => {
-      updateLightbox(idx);
-      if (lightbox) {
-        lightbox.classList.add('active');
-        lightbox.setAttribute('aria-hidden', 'false');
-      }
-    });
-  });
-
-  function closeLightbox() {
-    if (lightbox) {
-      lightbox.classList.remove('active');
-      lightbox.setAttribute('aria-hidden', 'true');
-    }
-  }
-
-  if (lightboxClose) lightboxClose.addEventListener('click', closeLightbox);
-  if (lightboxPrev) lightboxPrev.addEventListener('click', () => updateLightbox(currentPhotoIndex - 1));
-  if (lightboxNext) lightboxNext.addEventListener('click', () => updateLightbox(currentPhotoIndex + 1));
-
-  // Close on backdrop click
-  if (lightbox) {
-    lightbox.addEventListener('click', (e) => {
-      if (e.target.classList.contains('lightbox-backdrop')) {
-        closeLightbox();
-      }
-    });
-  }
-
-  // Keyboard navigation
-  document.addEventListener('keydown', (e) => {
-    if (!lightbox || !lightbox.classList.contains('active')) return;
-    if (e.key === 'Escape') closeLightbox();
-    if (e.key === 'ArrowLeft') updateLightbox(currentPhotoIndex - 1);
-    if (e.key === 'ArrowRight') updateLightbox(currentPhotoIndex + 1);
-  });
-
-  // --------------------------------------------------------
-  // 5. CAKE & CANDLE BLOWOUT INTERACTION
-  // --------------------------------------------------------
-  const blowCandlesBtn = document.getElementById('blowCandlesBtn');
-  const candles = document.querySelectorAll('.candle');
-  const wishRevealedCard = document.getElementById('wishRevealedCard');
-
-  if (blowCandlesBtn) {
-    blowCandlesBtn.addEventListener('click', () => {
-      // Extinguish flames
-      candles.forEach((c) => c.classList.add('blown-out'));
-
-      // Confetti celebration
-      fireConfetti(140);
-      playChime();
-
-      // Show birthday message card
-      if (wishRevealedCard) {
-        wishRevealedCard.classList.remove('hidden');
-        wishRevealedCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      }
-
-      blowCandlesBtn.innerHTML = '<span>Wish Made! ✨ Happy Birthday!</span>';
-      blowCandlesBtn.style.opacity = '0.85';
-      blowCandlesBtn.disabled = true;
-    });
-  }
-
-  // --------------------------------------------------------
-  // 6. FLOATING HEARTS GENERATOR IN SECTION G
-  // --------------------------------------------------------
-  const heartsContainer = document.getElementById('floatingHeartsContainer');
-  if (heartsContainer) {
-    setInterval(() => {
-      const heart = document.createElement('div');
-      heart.className = 'floating-heart';
-      heart.innerHTML = ['❤️', '💖', '🌸', '✨', '💕'][Math.floor(Math.random() * 5)];
-      heart.style.left = Math.random() * 90 + 5 + '%';
-      heart.style.animationDuration = Math.random() * 2 + 3 + 's';
-      heartsContainer.appendChild(heart);
-
-      setTimeout(() => heart.remove(), 4000);
-    }, 900);
-  }
-
-  // --------------------------------------------------------
-  // 7. BACKGROUND MUSIC & SOUND SYSTEM
+  // BACKGROUND MUSIC
   // --------------------------------------------------------
   const musicToggleBtn = document.getElementById('musicToggleBtn');
-  const musicIcon = document.getElementById('musicIcon');
   const musicLabel = document.getElementById('musicLabel');
   const bgAudio = document.getElementById('bgAudio');
   let isPlaying = false;
 
-  // Web Audio Synthesizer (fallback melodic chime if no audio file present)
-  let audioCtx = null;
-  function getAudioContext() {
-    if (!audioCtx) {
-      audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-    }
-    return audioCtx;
-  }
-
-  function playChime() {
-    try {
-      const ctx = getAudioContext();
-      if (ctx.state === 'suspended') ctx.resume();
-
-      const notes = [523.25, 659.25, 783.99, 1046.50]; // C5, E5, G5, C6
-      notes.forEach((freq, idx) => {
-        const osc = ctx.createOscillator();
-        const gain = ctx.createGain();
-        osc.type = 'sine';
-        osc.frequency.setValueAtTime(freq, ctx.currentTime + idx * 0.12);
-
-        gain.gain.setValueAtTime(0, ctx.currentTime + idx * 0.12);
-        gain.gain.linearRampToValueAtTime(0.18, ctx.currentTime + idx * 0.12 + 0.05);
-        gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + idx * 0.12 + 1.2);
-
-        osc.connect(gain);
-        gain.connect(ctx.destination);
-
-        osc.start(ctx.currentTime + idx * 0.12);
-        osc.stop(ctx.currentTime + idx * 0.12 + 1.3);
-      });
-    } catch (e) {
-      // AudioContext unavailable or restricted
-    }
-  }
-
-  // Ambient synth loop for background music if audio file fails
   let synthInterval = null;
   function startAmbientSynth() {
-    const scale = [261.63, 329.63, 392.00, 440.00, 523.25]; // C major pentatonic
+    const scale = [261.63, 329.63, 392.00, 440.00, 523.25];
     playAmbientNote();
-    synthInterval = setInterval(playAmbientNote, 1600);
+    synthInterval = setInterval(playAmbientNote, 1800);
 
     function playAmbientNote() {
       try {
@@ -349,17 +429,13 @@ document.addEventListener('DOMContentLoaded', () => {
         const freq = scale[Math.floor(Math.random() * scale.length)];
         const osc = ctx.createOscillator();
         const gain = ctx.createGain();
-
         osc.type = 'triangle';
         osc.frequency.setValueAtTime(freq, ctx.currentTime);
-
         gain.gain.setValueAtTime(0, ctx.currentTime);
         gain.gain.linearRampToValueAtTime(0.08, ctx.currentTime + 0.3);
         gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 2.2);
-
         osc.connect(gain);
         gain.connect(ctx.destination);
-
         osc.start();
         osc.stop(ctx.currentTime + 2.3);
       } catch (err) {}
@@ -376,14 +452,10 @@ document.addEventListener('DOMContentLoaded', () => {
   if (musicToggleBtn) {
     musicToggleBtn.addEventListener('click', () => {
       if (!isPlaying) {
-        // Try playing user's audio file first
         if (bgAudio && bgAudio.src && !bgAudio.src.endsWith('none')) {
           bgAudio.play()
-            .then(() => {
-              setPlayingState(true);
-            })
+            .then(() => setPlayingState(true))
             .catch(() => {
-              // Fallback to ambient soothing chime loop
               startAmbientSynth();
               setPlayingState(true);
             });
