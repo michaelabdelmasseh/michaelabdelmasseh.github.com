@@ -1,17 +1,447 @@
 /**
  * ========================================================
- *  MOM'S BIRTHDAY WEBSITE — MULTI-STAGE CONTROLLER
- *  Envelope (الظرف) -> Prank Choice -> Luxury Cake Spin Warp -> 3D Horizontal Carousel
+ *  MOM'S LUXURY BIRTHDAY SURPRISE — CONTROLLER
+ *  Page 1: Envelope -> Page 2: Prank Choice -> Page 3: Luxury Cake -> Page 4: 3D Gallery
  * ========================================================
  */
 
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener("DOMContentLoaded", () => {
+  const config = window.birthdayConfig || {};
 
   // --------------------------------------------------------
-  // WEB AUDIO SOUND EFFECTS (No external files needed)
+  // 1. POPULATE CONFIG DATA INTO DOM
+  // --------------------------------------------------------
+  function populateConfig() {
+    // Page 1
+    if (config.envelope) {
+      const b = document.getElementById("p1Badge");
+      const i = document.getElementById("p1Instruction");
+      const t = document.getElementById("p1LetterTitle");
+      const d = document.getElementById("p1LetterBody");
+      const c = document.getElementById("p1ContinueBtnText");
+      if (b && config.envelope.badge) b.textContent = config.envelope.badge;
+      if (i && config.envelope.instruction) i.textContent = config.envelope.instruction;
+      if (t && config.envelope.greetingTitle) t.textContent = config.envelope.greetingTitle;
+      if (d && config.envelope.letterPreview) d.textContent = config.envelope.letterPreview;
+      if (c && config.envelope.continueButton) c.textContent = config.envelope.continueButton;
+    }
+
+    // Page 2
+    if (config.giftChoice) {
+      const h = document.getElementById("p2Heading");
+      const s = document.getElementById("p2Subtitle");
+      const a = document.getElementById("p2AcceptBtnText");
+      const r = document.getElementById("p2RefuseBtnText");
+      if (h && config.giftChoice.heading) h.textContent = config.giftChoice.heading;
+      if (s && config.giftChoice.subtitle) s.textContent = config.giftChoice.subtitle;
+      if (a && config.giftChoice.acceptBtn) a.textContent = config.giftChoice.acceptBtn;
+      if (r && config.giftChoice.refuseBtn) r.textContent = config.giftChoice.refuseBtn;
+    }
+
+    // Page 3
+    if (config.cakeScene) {
+      const h = document.getElementById("p3Heading");
+      const s = document.getElementById("p3Subtitle");
+      const l = document.getElementById("p3LightBtnText");
+      if (h && config.cakeScene.heading) h.textContent = config.cakeScene.heading;
+      if (s && config.cakeScene.subtitle) s.textContent = config.cakeScene.subtitle;
+      if (l && config.cakeScene.lightButton) l.textContent = config.cakeScene.lightButton;
+    }
+
+    // Page 4
+    if (config.gallery) {
+      const h = document.getElementById("p4Heading");
+      const s = document.getElementById("p4Subtitle");
+      const ch = document.getElementById("p4ClosingHeading");
+      const cm = document.getElementById("p4ClosingMessage");
+      const cs = document.getElementById("p4Signature");
+      if (h && config.gallery.heading) h.textContent = config.gallery.heading;
+      if (s && config.gallery.subtitle) s.textContent = config.gallery.subtitle;
+      if (ch && config.gallery.closingHeading) ch.textContent = config.gallery.closingHeading;
+      if (cm && config.gallery.closingMessage) cm.textContent = config.gallery.closingMessage;
+      if (cs && config.gallery.signature) cs.textContent = config.gallery.signature;
+
+      buildGalleryCards(config.gallery.photos || []);
+    }
+  }
+
+  // --------------------------------------------------------
+  // 2. BUILD 3D PHOTO GALLERY CARDS
+  // --------------------------------------------------------
+  const galleryTrack = document.getElementById("galleryTrack");
+
+  function getFallbackSvg(index) {
+    const icons = ["🌸", "✨", "🌷", "☀️", "💖", "☕", "👑", "💐"];
+    const icon = icons[index % icons.length];
+    return `data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='260' height='250' viewBox='0 0 260 250'><rect width='100%' height='100%' fill='%23FFF3F6'/><circle cx='130' cy='115' r='50' fill='%23FDE8EE'/><text x='130' y='130' font-size='42' text-anchor='middle'>${icon}</text><text x='130' y='185' font-family='serif' font-size='15' fill='%23B85567' text-anchor='middle'>Treasured Memory</text><text x='130' y='210' font-family='sans-serif' font-size='11' fill='%239E8A95' text-anchor='middle'>Add your photo to images/</text></svg>`;
+  }
+
+  function buildGalleryCards(photos) {
+    if (!galleryTrack) return;
+    galleryTrack.innerHTML = "";
+
+    // Duplicate list once to create continuous infinite scroll effect
+    const list = [...photos, ...photos];
+
+    list.forEach((item, index) => {
+      const card = document.createElement("div");
+      card.className = "gallery-card";
+      card.setAttribute("role", "button");
+      card.setAttribute("tabindex", "0");
+      card.setAttribute("aria-label", `View photo: ${item.caption}`);
+
+      // Slight organic vertical-axis tilt alternation
+      const tilt = index % 2 === 0 ? -6 : 6;
+      card.style.transform = `rotateY(${tilt}deg)`;
+
+      const holder = document.createElement("div");
+      holder.className = "card-image-holder";
+
+      const img = document.createElement("img");
+      img.src = item.src;
+      img.alt = item.alt || item.caption || "Mom's Memory";
+      img.loading = "lazy";
+      img.onerror = () => {
+        img.src = getFallbackSvg(index);
+      };
+
+      holder.appendChild(img);
+
+      const meta = document.createElement("div");
+      meta.className = "card-meta";
+
+      const caption = document.createElement("p");
+      caption.className = "card-caption";
+      caption.textContent = item.caption;
+
+      meta.appendChild(caption);
+
+      if (item.date) {
+        const dateSpan = document.createElement("span");
+        dateSpan.className = "card-date";
+        dateSpan.textContent = item.date;
+        meta.appendChild(dateSpan);
+      }
+
+      card.appendChild(holder);
+      card.appendChild(meta);
+
+      // Lightbox click
+      card.addEventListener("click", () => {
+        openLightbox(img.src, item.caption, item.date || "");
+      });
+      card.addEventListener("keydown", (e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          openLightbox(img.src, item.caption, item.date || "");
+        }
+      });
+
+      galleryTrack.appendChild(card);
+    });
+  }
+
+  // --------------------------------------------------------
+  // 3. LIGHTBOX DIALOG
+  // --------------------------------------------------------
+  const lightboxModal = document.getElementById("lightboxModal");
+  const lightboxImg = document.getElementById("lightboxImg");
+  const lightboxCaption = document.getElementById("lightboxCaption");
+  const lightboxDate = document.getElementById("lightboxDate");
+  const lightboxCloseBtn = document.getElementById("lightboxCloseBtn");
+
+  function openLightbox(src, caption, date) {
+    if (!lightboxModal) return;
+    lightboxImg.src = src;
+    lightboxCaption.textContent = caption;
+    lightboxDate.textContent = date;
+    lightboxModal.classList.add("active");
+    lightboxModal.setAttribute("aria-hidden", "false");
+    document.body.style.overflow = "hidden";
+  }
+
+  function closeLightbox() {
+    if (!lightboxModal) return;
+    lightboxModal.classList.remove("active");
+    lightboxModal.setAttribute("aria-hidden", "true");
+    document.body.style.overflow = "";
+  }
+
+  if (lightboxCloseBtn) lightboxCloseBtn.addEventListener("click", closeLightbox);
+  if (lightboxModal) {
+    lightboxModal.addEventListener("click", (e) => {
+      if (e.target.classList.contains("lightbox-backdrop")) closeLightbox();
+    });
+  }
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape" && lightboxModal && lightboxModal.classList.contains("active")) {
+      closeLightbox();
+    }
+  });
+
+  // --------------------------------------------------------
+  // 4. PAGE TRANSITIONS SYSTEM
+  // --------------------------------------------------------
+  const pages = {
+    1: document.getElementById("page1"),
+    2: document.getElementById("page2"),
+    3: document.getElementById("page3"),
+    4: document.getElementById("page4"),
+  };
+  const overlay = document.getElementById("transitionOverlay");
+  let currentPage = 1;
+  let isTransitioning = false;
+
+  function switchPage(pageNumber, withOverlayFlash = false) {
+    if (isTransitioning || !pages[pageNumber]) return;
+    isTransitioning = true;
+
+    if (withOverlayFlash && overlay) {
+      overlay.classList.add("active");
+      setTimeout(() => {
+        performPageSwitch(pageNumber);
+        setTimeout(() => {
+          overlay.classList.remove("active");
+          isTransitioning = false;
+        }, 400);
+      }, 400);
+    } else {
+      performPageSwitch(pageNumber);
+      setTimeout(() => {
+        isTransitioning = false;
+      }, 500);
+    }
+  }
+
+  function performPageSwitch(pageNumber) {
+    Object.values(pages).forEach((page) => {
+      if (page) page.classList.remove("active");
+    });
+    const target = pages[pageNumber];
+    if (target) {
+      target.classList.add("active");
+      currentPage = pageNumber;
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+  }
+
+  // --------------------------------------------------------
+  // 5. PAGE 1: ENVELOPE INTERACTION
+  // --------------------------------------------------------
+  const envelopeElement = document.getElementById("envelopeElement");
+  const continueToChoiceBtn = document.getElementById("continueToChoiceBtn");
+  let isEnvelopeOpened = false;
+
+  function openEnvelope() {
+    if (isEnvelopeOpened || !envelopeElement) return;
+    isEnvelopeOpened = true;
+    envelopeElement.classList.add("opened");
+    playChime();
+  }
+
+  if (envelopeElement) {
+    envelopeElement.addEventListener("click", (e) => {
+      // Prevent re-trigger if clicking continue button inside
+      if (e.target.closest("#continueToChoiceBtn")) return;
+      openEnvelope();
+    });
+    envelopeElement.addEventListener("keydown", (e) => {
+      if (e.key === "Enter" || e.key === " ") {
+        e.preventDefault();
+        openEnvelope();
+      }
+    });
+  }
+
+  if (continueToChoiceBtn) {
+    continueToChoiceBtn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      switchPage(2, false);
+    });
+  }
+
+  // --------------------------------------------------------
+  // 6. PAGE 2: PLAYFUL GIFT CHOICE & RUNAWAY BUTTON
+  // --------------------------------------------------------
+  const wantGiftBtn = document.getElementById("wantGiftBtn");
+  const dontWantBtn = document.getElementById("dontWantBtn");
+  const teaseFeedback = document.getElementById("teaseFeedback");
+  let teaseIndex = 0;
+
+  function dodgeRunawayButton() {
+    if (!dontWantBtn || !wantGiftBtn) return;
+    dontWantBtn.classList.add("dodging");
+    playBlip();
+
+    const btnWidth = dontWantBtn.offsetWidth || 190;
+    const btnHeight = dontWantBtn.offsetHeight || 50;
+    const padding = 24;
+
+    // Viewport boundaries
+    const maxX = window.innerWidth - btnWidth - padding;
+    const maxY = window.innerHeight - btnHeight - padding;
+
+    // Safety zone around "I want my gift" button (NEVER OVERLAP)
+    const safeRect = wantGiftBtn.getBoundingClientRect();
+    const safetyBuffer = 60;
+
+    let candidateX, candidateY;
+    let attempts = 0;
+    let collision = true;
+
+    while (collision && attempts < 15) {
+      candidateX = Math.max(padding, Math.floor(Math.random() * maxX));
+      candidateY = Math.max(padding, Math.floor(Math.random() * maxY));
+
+      // Check collision with wantGiftBtn
+      const overlapsX =
+        candidateX + btnWidth > safeRect.left - safetyBuffer &&
+        candidateX < safeRect.right + safetyBuffer;
+      const overlapsY =
+        candidateY + btnHeight > safeRect.top - safetyBuffer &&
+        candidateY < safeRect.bottom + safetyBuffer;
+
+      if (!overlapsX || !overlapsY) {
+        collision = false;
+      }
+      attempts++;
+    }
+
+    dontWantBtn.style.left = `${candidateX}px`;
+    dontWantBtn.style.top = `${candidateY}px`;
+
+    // Tease message update
+    const messages = (config.giftChoice && config.giftChoice.teaseMessages) || [
+      "Are you sure? 🙈",
+      "Nope, can't catch me! 🏃‍♀️💨",
+      "Mom, you HAVE to accept this gift! ❤️",
+      "Just give up and click the pink one! 😜",
+      "You can't escape my love! 🥰"
+    ];
+
+    if (teaseFeedback) {
+      teaseFeedback.textContent = messages[teaseIndex % messages.length];
+    }
+    teaseIndex++;
+  }
+
+  if (dontWantBtn) {
+    dontWantBtn.addEventListener("mouseenter", dodgeRunawayButton);
+    dontWantBtn.addEventListener("touchstart", (e) => {
+      e.preventDefault();
+      dodgeRunawayButton();
+    });
+    dontWantBtn.addEventListener("click", (e) => {
+      e.preventDefault();
+      dodgeRunawayButton();
+    });
+  }
+
+  if (wantGiftBtn) {
+    wantGiftBtn.addEventListener("click", () => {
+      playChime();
+      switchPage(3, false);
+    });
+  }
+
+  // --------------------------------------------------------
+  // 7. PAGE 3: LUXURY CAKE & ACCELERATING ROTATION
+  // --------------------------------------------------------
+  const lightCandlesBtn = document.getElementById("lightCandlesBtn");
+  const cakeRotationScene = document.getElementById("cakeRotationScene");
+  const candlesDeck = document.getElementById("candlesDeck");
+  const spotlightBackdrop = document.querySelector(".spotlight-backdrop");
+
+  if (lightCandlesBtn && cakeRotationScene) {
+    lightCandlesBtn.addEventListener("click", () => {
+      lightCandlesBtn.disabled = true;
+      if (config.cakeScene && config.cakeScene.lightingText) {
+        lightCandlesBtn.innerHTML = `<span>${config.cakeScene.lightingText}</span>`;
+      }
+
+      // 1. Candles glow & surrounding light warms
+      if (candlesDeck) candlesDeck.classList.add("candles-lit");
+      if (spotlightBackdrop) spotlightBackdrop.classList.add("warm-glow");
+      playChime();
+
+      // 2. Begin smooth accelerating rotation
+      setTimeout(() => {
+        playWarpSound();
+        cakeRotationScene.classList.add("spinning");
+
+        // 3. Complete navigation to Page 4 reliably at climax
+        setTimeout(() => {
+          switchPage(4, true);
+
+          // Reset Page 3 state for clean replay capability
+          cakeRotationScene.classList.remove("spinning");
+          if (candlesDeck) candlesDeck.classList.remove("candles-lit");
+          if (spotlightBackdrop) spotlightBackdrop.classList.remove("warm-glow");
+          lightCandlesBtn.disabled = false;
+          if (config.cakeScene && config.cakeScene.lightButton) {
+            lightCandlesBtn.innerHTML = `<span class="btn-sparkle">✨</span><span>${config.cakeScene.lightButton}</span><span class="btn-sparkle">✨</span>`;
+          }
+        }, 2600);
+      }, 500);
+    });
+  }
+
+  // --------------------------------------------------------
+  // 8. PAGE 4: GALLERY PLAYBACK & REPLAY
+  // --------------------------------------------------------
+  const playPauseBtn = document.getElementById("playPauseBtn");
+  const prevPhotoBtn = document.getElementById("prevPhotoBtn");
+  const nextPhotoBtn = document.getElementById("nextPhotoBtn");
+  const replayJourneyBtn = document.getElementById("replayJourneyBtn");
+  let isGalleryPaused = false;
+
+  if (playPauseBtn && galleryTrack) {
+    playPauseBtn.addEventListener("click", () => {
+      isGalleryPaused = !isGalleryPaused;
+      if (isGalleryPaused) {
+        galleryTrack.classList.add("paused");
+        playPauseBtn.textContent = "▶ Resume";
+      } else {
+        galleryTrack.classList.remove("paused");
+        playPauseBtn.textContent = "⏸ Pause";
+      }
+    });
+  }
+
+  if (prevPhotoBtn && galleryTrack) {
+    prevPhotoBtn.addEventListener("click", () => {
+      galleryTrack.classList.add("paused");
+      galleryTrack.scrollBy({ left: -280, behavior: "smooth" });
+    });
+  }
+
+  if (nextPhotoBtn && galleryTrack) {
+    nextPhotoBtn.addEventListener("click", () => {
+      galleryTrack.classList.add("paused");
+      galleryTrack.scrollBy({ left: 280, behavior: "smooth" });
+    });
+  }
+
+  if (replayJourneyBtn) {
+    replayJourneyBtn.addEventListener("click", () => {
+      // Clean reset
+      isEnvelopeOpened = false;
+      if (envelopeElement) envelopeElement.classList.remove("opened");
+      if (dontWantBtn) {
+        dontWantBtn.classList.remove("dodging");
+        dontWantBtn.style.left = "";
+        dontWantBtn.style.top = "";
+      }
+      teaseIndex = 0;
+      switchPage(1, true);
+    });
+  }
+
+  // --------------------------------------------------------
+  // 9. WEB AUDIO SYNTHESIZER (No external sound files required)
   // --------------------------------------------------------
   let audioCtx = null;
-  function getAudioContext() {
+  function getAudioCtx() {
     if (!audioCtx) {
       audioCtx = new (window.AudioContext || window.webkitAudioContext)();
     }
@@ -20,13 +450,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function playChime() {
     try {
-      const ctx = getAudioContext();
-      if (ctx.state === 'suspended') ctx.resume();
-      const notes = [523.25, 659.25, 783.99, 1046.50]; // C5, E5, G5, C6
+      const ctx = getAudioCtx();
+      if (ctx.state === "suspended") ctx.resume();
+      const notes = [523.25, 659.25, 783.99, 1046.5]; // C5, E5, G5, C6
       notes.forEach((freq, idx) => {
         const osc = ctx.createOscillator();
         const gain = ctx.createGain();
-        osc.type = 'sine';
+        osc.type = "sine";
         osc.frequency.setValueAtTime(freq, ctx.currentTime + idx * 0.1);
         gain.gain.setValueAtTime(0, ctx.currentTime + idx * 0.1);
         gain.gain.linearRampToValueAtTime(0.18, ctx.currentTime + idx * 0.1 + 0.04);
@@ -39,447 +469,177 @@ document.addEventListener('DOMContentLoaded', () => {
     } catch (e) {}
   }
 
-  function playDodgeSound() {
+  function playBlip() {
     try {
-      const ctx = getAudioContext();
-      if (ctx.state === 'suspended') ctx.resume();
+      const ctx = getAudioCtx();
+      if (ctx.state === "suspended") ctx.resume();
       const osc = ctx.createOscillator();
       const gain = ctx.createGain();
-      osc.type = 'triangle';
-      osc.frequency.setValueAtTime(300, ctx.currentTime);
-      osc.frequency.exponentialRampToValueAtTime(650, ctx.currentTime + 0.18);
-      gain.gain.setValueAtTime(0.12, ctx.currentTime);
-      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.2);
+      osc.type = "triangle";
+      osc.frequency.setValueAtTime(320, ctx.currentTime);
+      osc.frequency.exponentialRampToValueAtTime(700, ctx.currentTime + 0.15);
+      gain.gain.setValueAtTime(0.1, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.18);
       osc.connect(gain);
       gain.connect(ctx.destination);
       osc.start();
-      osc.stop(ctx.currentTime + 0.2);
+      osc.stop(ctx.currentTime + 0.18);
     } catch (e) {}
   }
 
   function playWarpSound() {
     try {
-      const ctx = getAudioContext();
-      if (ctx.state === 'suspended') ctx.resume();
+      const ctx = getAudioCtx();
+      if (ctx.state === "suspended") ctx.resume();
       const osc = ctx.createOscillator();
       const gain = ctx.createGain();
-      osc.type = 'sawtooth';
-      osc.frequency.setValueAtTime(150, ctx.currentTime);
-      // Sweeping frequency that rises as it speeds up
-      osc.frequency.exponentialRampToValueAtTime(1400, ctx.currentTime + 2.4);
-      gain.gain.setValueAtTime(0.05, ctx.currentTime);
-      gain.gain.linearRampToValueAtTime(0.22, ctx.currentTime + 1.8);
-      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 2.6);
+      osc.type = "sawtooth";
+      osc.frequency.setValueAtTime(140, ctx.currentTime);
+      osc.frequency.exponentialRampToValueAtTime(1200, ctx.currentTime + 2.4);
+      gain.gain.setValueAtTime(0.04, ctx.currentTime);
+      gain.gain.linearRampToValueAtTime(0.18, ctx.currentTime + 1.8);
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 2.5);
       osc.connect(gain);
       gain.connect(ctx.destination);
       osc.start();
-      osc.stop(ctx.currentTime + 2.7);
+      osc.stop(ctx.currentTime + 2.6);
     } catch (e) {}
   }
 
-  // --------------------------------------------------------
-  // STAGE CONTROLLER WITH TELEPORT FLASH
-  // --------------------------------------------------------
-  const stages = {
-    stage1: document.getElementById('stage1'),
-    stage2: document.getElementById('stage2'),
-    stage3: document.getElementById('stage3'),
-    stage4: document.getElementById('stage4')
-  };
-  const flash = document.getElementById('teleportFlash');
+  // Background Music Controller
+  const musicToggleBtn = document.getElementById("musicToggleBtn");
+  const musicLabel = document.getElementById("musicLabel");
+  const bgAudio = document.getElementById("bgAudio");
+  let isMusicPlaying = false;
+  let synthLoop = null;
 
-  function goToStage(stageId, withFlash = false) {
-    if (withFlash && flash) {
-      flash.classList.add('active');
-      setTimeout(() => {
-        switchActiveStage(stageId);
-        setTimeout(() => {
-          flash.classList.remove('active');
-        }, 300);
-      }, 400);
-    } else {
-      switchActiveStage(stageId);
-    }
-  }
+  function startAmbientPiano() {
+    const scale = [261.63, 329.63, 392.0, 440.0, 523.25];
+    playPianoNote();
+    synthLoop = setInterval(playPianoNote, 1800);
 
-  function switchActiveStage(stageId) {
-    Object.values(stages).forEach(stage => {
-      if (stage) stage.classList.remove('active');
-    });
-    const target = stages[stageId];
-    if (target) {
-      target.classList.add('active');
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    }
-  }
-
-  // --------------------------------------------------------
-  // STAGE 1: THE ENVELOPE (الظرف)
-  // --------------------------------------------------------
-  const envelopeBox = document.getElementById('envelopeBox');
-  const waxSealBtn = document.getElementById('waxSealBtn');
-  const letterCard = document.getElementById('letterCard');
-  let envelopeOpened = false;
-
-  function openEnvelope() {
-    if (envelopeOpened) return;
-    envelopeOpened = true;
-    envelopeBox.classList.add('opened');
-    playChime();
-    fireConfetti(60);
-
-    // After brief reveal, teleport to Stage 2 (Choice)
-    setTimeout(() => {
-      goToStage('stage2', true);
-    }, 2000);
-  }
-
-  if (envelopeBox) envelopeBox.addEventListener('click', openEnvelope);
-  if (waxSealBtn) waxSealBtn.addEventListener('click', (e) => {
-    e.stopPropagation();
-    openEnvelope();
-  });
-  if (letterCard) letterCard.addEventListener('click', (e) => {
-    e.stopPropagation();
-    goToStage('stage2', true);
-  });
-
-  // --------------------------------------------------------
-  // STAGE 2: PRANK CHOICE (RUNAWAY BUTTON & GIFT)
-  // --------------------------------------------------------
-  const wantGiftBtn = document.getElementById('wantGiftBtn');
-  const dontWantBtn = document.getElementById('dontWantBtn');
-  const prankTeaseText = document.getElementById('prankTeaseText');
-
-  const teaseMessages = [
-    "Are you sure, Mom? 😂",
-    "Nope, can't touch this! 🏃‍♀️💨",
-    "Mom, you HAVE to accept this gift! ❤️",
-    "Just give up and click the pink one! 😜",
-    "I won't let you refuse! You deserve the world! 🎁",
-    "Still trying? Just tap 'I Want My Gift'! 🥰"
-  ];
-  let dodgeCount = 0;
-
-  function dodgeButton() {
-    if (!dontWantBtn) return;
-    dontWantBtn.classList.add('dodging');
-    playDodgeSound();
-
-    const btnWidth = dontWantBtn.offsetWidth || 180;
-    const btnHeight = dontWantBtn.offsetHeight || 50;
-    const padding = 30;
-
-    const maxX = window.innerWidth - btnWidth - padding;
-    const maxY = window.innerHeight - btnHeight - padding;
-
-    const randomX = Math.max(padding, Math.floor(Math.random() * maxX));
-    const randomY = Math.max(padding, Math.floor(Math.random() * maxY));
-
-    dontWantBtn.style.left = `${randomX}px`;
-    dontWantBtn.style.top = `${randomY}px`;
-
-    // Update teasing message
-    if (prankTeaseText) {
-      prankTeaseText.textContent = teaseMessages[dodgeCount % teaseMessages.length];
-    }
-    dodgeCount++;
-  }
-
-  if (dontWantBtn) {
-    dontWantBtn.addEventListener('mouseenter', dodgeButton);
-    dontWantBtn.addEventListener('touchstart', (e) => {
-      e.preventDefault();
-      dodgeButton();
-    });
-    dontWantBtn.addEventListener('click', (e) => {
-      e.preventDefault();
-      dodgeButton();
-    });
-  }
-
-  if (wantGiftBtn) {
-    wantGiftBtn.addEventListener('click', () => {
-      playChime();
-      fireConfetti(100);
-      // Teleport to Stage 3: The Royal Cake
-      goToStage('stage3', true);
-    });
-  }
-
-  // --------------------------------------------------------
-  // STAGE 3: LUXURY CAKE & SPEEDING ROTATION WARP
-  // --------------------------------------------------------
-  const lightCandlesBtn = document.getElementById('lightCandlesBtn');
-  const cakeVortexWrapper = document.getElementById('cakeVortexWrapper');
-
-  if (lightCandlesBtn && cakeVortexWrapper) {
-    lightCandlesBtn.addEventListener('click', () => {
-      lightCandlesBtn.disabled = true;
-      lightCandlesBtn.innerHTML = '<span>Accelerating into Surprise... ✨</span>';
-
-      // Play rising warp audio
-      playWarpSound();
-
-      // Start the speeding rotation
-      cakeVortexWrapper.classList.add('spinning-warp');
-
-      // Teleport right at the climax of the spin
-      setTimeout(() => {
-        goToStage('stage4', true);
-        fireConfetti(160);
-        cakeVortexWrapper.classList.remove('spinning-warp');
-        lightCandlesBtn.disabled = false;
-        lightCandlesBtn.innerHTML = '<span>✨ Light Up The Candles & Enter the Dream 🎂</span>';
-      }, 2500);
-    });
-  }
-
-  // --------------------------------------------------------
-  // STAGE 4: 3D HORIZONTAL ROTATING CAROUSEL & FINALE
-  // --------------------------------------------------------
-  const carousel3D = document.getElementById('carousel3D');
-  const toggleCarouselBtn = document.getElementById('toggleCarouselBtn');
-  let isCarouselPaused = false;
-
-  if (toggleCarouselBtn && carousel3D) {
-    toggleCarouselBtn.addEventListener('click', () => {
-      isCarouselPaused = !isCarouselPaused;
-      if (isCarouselPaused) {
-        carousel3D.classList.add('paused');
-        toggleCarouselBtn.textContent = '▶ Resume Rotation';
-      } else {
-        carousel3D.classList.remove('paused');
-        toggleCarouselBtn.textContent = '⏸ Pause Rotation';
-      }
-    });
-  }
-
-  // Replay Journey Button
-  const replayBtn = document.getElementById('replayBtn');
-  if (replayBtn) {
-    replayBtn.addEventListener('click', () => {
-      envelopeOpened = false;
-      if (envelopeBox) envelopeBox.classList.remove('opened');
-      if (dontWantBtn) {
-        dontWantBtn.classList.remove('dodging');
-        dontWantBtn.style.left = '';
-        dontWantBtn.style.top = '';
-      }
-      dodgeCount = 0;
-      goToStage('stage1', true);
-    });
-  }
-
-  // --------------------------------------------------------
-  // FALLING ROSE PETALS (CANVAS)
-  // --------------------------------------------------------
-  const petalsCanvas = document.getElementById('petalsCanvas');
-  if (petalsCanvas) {
-    const ctx = petalsCanvas.getContext('2d');
-    let width = (petalsCanvas.width = window.innerWidth);
-    let height = (petalsCanvas.height = window.innerHeight);
-
-    window.addEventListener('resize', () => {
-      width = petalsCanvas.width = window.innerWidth;
-      height = petalsCanvas.height = window.innerHeight;
-    });
-
-    const petals = [];
-    const colors = ['#F7C5D0', '#FDE8EE', '#F3A8B6', '#EBB0BA', '#FFEBF0'];
-    const maxPetals = window.innerWidth < 600 ? 16 : 28;
-
-    for (let i = 0; i < maxPetals; i++) {
-      petals.push({
-        x: Math.random() * width,
-        y: Math.random() * height - height,
-        r: Math.random() * 8 + 6,
-        d: Math.random() * maxPetals,
-        color: colors[Math.floor(Math.random() * colors.length)],
-        tilt: Math.floor(Math.random() * 10) - 10,
-        tiltAngle: 0,
-        tiltAngleInc: Math.random() * 0.06 + 0.03,
-        speedY: Math.random() * 1.1 + 0.7,
-        speedX: Math.random() * 1 - 0.5
-      });
-    }
-
-    function renderPetals() {
-      ctx.clearRect(0, 0, width, height);
-      petals.forEach(p => {
-        p.tiltAngle += p.tiltAngleInc;
-        p.y += p.speedY;
-        p.x += Math.sin(p.d) + p.speedX;
-        p.tilt = Math.sin(p.tiltAngle - p.d / 3) * 14;
-
-        ctx.beginPath();
-        ctx.fillStyle = p.color;
-        ctx.globalAlpha = 0.65;
-        ctx.ellipse(p.x, p.y, p.r, p.r * 1.4, (p.tilt * Math.PI) / 180, 0, 2 * Math.PI);
-        ctx.fill();
-
-        if (p.y > height + 20) {
-          p.y = -20;
-          p.x = Math.random() * width;
-        }
-      });
-      requestAnimationFrame(renderPetals);
-    }
-    renderPetals();
-  }
-
-  // --------------------------------------------------------
-  // CONFETTI CANNON (CANVAS)
-  // --------------------------------------------------------
-  const confettiCanvas = document.getElementById('confettiCanvas');
-  let confettiCtx = confettiCanvas ? confettiCanvas.getContext('2d') : null;
-  let confettiParticles = [];
-  let isConfettiAnimating = false;
-
-  function resizeConfetti() {
-    if (confettiCanvas) {
-      confettiCanvas.width = window.innerWidth;
-      confettiCanvas.height = window.innerHeight;
-    }
-  }
-  window.addEventListener('resize', resizeConfetti);
-  resizeConfetti();
-
-  function fireConfetti(count = 100) {
-    if (!confettiCanvas || !confettiCtx) return;
-    const colors = ['#D4687A', '#F7C5D0', '#C9A55A', '#FFD700', '#FFFDF9'];
-    const w = confettiCanvas.width;
-    const h = confettiCanvas.height;
-
-    for (let i = 0; i < count; i++) {
-      confettiParticles.push({
-        x: w / 2 + (Math.random() * 200 - 100),
-        y: h / 2 + (Math.random() * 100 - 50),
-        vx: (Math.random() - 0.5) * 18,
-        vy: -Math.random() * 15 - 6,
-        size: Math.random() * 8 + 5,
-        color: colors[Math.floor(Math.random() * colors.length)],
-        rotation: Math.random() * 360,
-        rotSpeed: (Math.random() - 0.5) * 10,
-        opacity: 1,
-        gravity: 0.35,
-        friction: 0.98
-      });
-    }
-
-    if (!isConfettiAnimating) {
-      isConfettiAnimating = true;
-      animateConfetti();
-    }
-  }
-
-  function animateConfetti() {
-    if (!confettiCtx || confettiParticles.length === 0) {
-      if (confettiCtx) confettiCtx.clearRect(0, 0, confettiCanvas.width, confettiCanvas.height);
-      isConfettiAnimating = false;
-      return;
-    }
-
-    confettiCtx.clearRect(0, 0, confettiCanvas.width, confettiCanvas.height);
-
-    for (let i = confettiParticles.length - 1; i >= 0; i--) {
-      const p = confettiParticles[i];
-      p.x += p.vx;
-      p.y += p.vy;
-      p.vy += p.gravity;
-      p.vx *= p.friction;
-      p.rotation += p.rotSpeed;
-      p.opacity -= 0.008;
-
-      if (p.opacity <= 0 || p.y > confettiCanvas.height + 20) {
-        confettiParticles.splice(i, 1);
-        continue;
-      }
-
-      confettiCtx.save();
-      confettiCtx.translate(p.x, p.y);
-      confettiCtx.rotate((p.rotation * Math.PI) / 180);
-      confettiCtx.fillStyle = p.color;
-      confettiCtx.globalAlpha = Math.max(0, p.opacity);
-      confettiCtx.fillRect(-p.size / 2, -p.size / 2, p.size, p.size * 1.4);
-      confettiCtx.restore();
-    }
-
-    requestAnimationFrame(animateConfetti);
-  }
-
-  // --------------------------------------------------------
-  // BACKGROUND MUSIC
-  // --------------------------------------------------------
-  const musicToggleBtn = document.getElementById('musicToggleBtn');
-  const musicLabel = document.getElementById('musicLabel');
-  const bgAudio = document.getElementById('bgAudio');
-  let isPlaying = false;
-
-  let synthInterval = null;
-  function startAmbientSynth() {
-    const scale = [261.63, 329.63, 392.00, 440.00, 523.25];
-    playAmbientNote();
-    synthInterval = setInterval(playAmbientNote, 1800);
-
-    function playAmbientNote() {
+    function playPianoNote() {
       try {
-        const ctx = getAudioContext();
-        if (ctx.state === 'suspended') ctx.resume();
+        const ctx = getAudioCtx();
+        if (ctx.state === "suspended") ctx.resume();
         const freq = scale[Math.floor(Math.random() * scale.length)];
         const osc = ctx.createOscillator();
         const gain = ctx.createGain();
-        osc.type = 'triangle';
+        osc.type = "triangle";
         osc.frequency.setValueAtTime(freq, ctx.currentTime);
         gain.gain.setValueAtTime(0, ctx.currentTime);
-        gain.gain.linearRampToValueAtTime(0.08, ctx.currentTime + 0.3);
-        gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 2.2);
+        gain.gain.linearRampToValueAtTime(0.07, ctx.currentTime + 0.25);
+        gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 2.1);
         osc.connect(gain);
         gain.connect(ctx.destination);
         osc.start();
-        osc.stop(ctx.currentTime + 2.3);
-      } catch (err) {}
+        osc.stop(ctx.currentTime + 2.2);
+      } catch (e) {}
     }
   }
 
-  function stopAmbientSynth() {
-    if (synthInterval) {
-      clearInterval(synthInterval);
-      synthInterval = null;
+  function stopAmbientPiano() {
+    if (synthLoop) {
+      clearInterval(synthLoop);
+      synthLoop = null;
     }
   }
 
   if (musicToggleBtn) {
-    musicToggleBtn.addEventListener('click', () => {
-      if (!isPlaying) {
-        if (bgAudio && bgAudio.src && !bgAudio.src.endsWith('none')) {
-          bgAudio.play()
-            .then(() => setPlayingState(true))
+    musicToggleBtn.addEventListener("click", () => {
+      if (!isMusicPlaying) {
+        if (bgAudio && bgAudio.src && !bgAudio.src.endsWith("none")) {
+          bgAudio
+            .play()
+            .then(() => setMusicState(true))
             .catch(() => {
-              startAmbientSynth();
-              setPlayingState(true);
+              startAmbientPiano();
+              setMusicState(true);
             });
         } else {
-          startAmbientSynth();
-          setPlayingState(true);
+          startAmbientPiano();
+          setMusicState(true);
         }
       } else {
         if (bgAudio) bgAudio.pause();
-        stopAmbientSynth();
-        setPlayingState(false);
+        stopAmbientPiano();
+        setMusicState(false);
       }
     });
   }
 
-  function setPlayingState(playing) {
-    isPlaying = playing;
+  function setMusicState(playing) {
+    isMusicPlaying = playing;
     if (playing) {
-      musicToggleBtn.classList.add('playing');
-      musicLabel.textContent = 'Pause Music';
+      musicToggleBtn.classList.add("playing");
+      musicLabel.textContent = "Pause Music";
     } else {
-      musicToggleBtn.classList.remove('playing');
-      musicLabel.textContent = 'Play Music';
+      musicToggleBtn.classList.remove("playing");
+      musicLabel.textContent = "Play Music";
     }
   }
 
+  // --------------------------------------------------------
+  // 10. ATMOSPHERE CANVAS (Subtle Petals & Golden Sparkles)
+  // --------------------------------------------------------
+  const canvas = document.getElementById("atmosphereCanvas");
+  if (canvas) {
+    const ctx = canvas.getContext("2d");
+    let w = (canvas.width = window.innerWidth);
+    let h = (canvas.height = window.innerHeight);
+
+    window.addEventListener("resize", () => {
+      w = canvas.width = window.innerWidth;
+      h = canvas.height = window.innerHeight;
+    });
+
+    const particles = [];
+    const colors = ["#F7C5D0", "#FDE8EE", "#F5BAC8", "#FFD700", "#F8E8C8"];
+    const count = window.innerWidth < 600 ? 14 : 26;
+
+    for (let i = 0; i < count; i++) {
+      particles.push({
+        x: Math.random() * w,
+        y: Math.random() * h - h,
+        r: Math.random() * 6 + 4,
+        color: colors[Math.floor(Math.random() * colors.length)],
+        speedY: Math.random() * 0.9 + 0.6,
+        speedX: Math.random() * 0.8 - 0.4,
+        tilt: Math.random() * 10 - 5,
+        tiltAngle: 0,
+        tiltInc: Math.random() * 0.05 + 0.02,
+      });
+    }
+
+    function renderAtmosphere() {
+      ctx.clearRect(0, 0, w, h);
+      particles.forEach((p) => {
+        p.tiltAngle += p.tiltInc;
+        p.y += p.speedY;
+        p.x += Math.sin(p.tiltAngle) * 0.5 + p.speedX;
+        p.tilt = Math.sin(p.tiltAngle) * 12;
+
+        ctx.beginPath();
+        ctx.fillStyle = p.color;
+        ctx.globalAlpha = 0.55;
+        ctx.ellipse(p.x, p.y, p.r, p.r * 1.3, (p.tilt * Math.PI) / 180, 0, 2 * Math.PI);
+        ctx.fill();
+
+        if (p.y > h + 20) {
+          p.y = -20;
+          p.x = Math.random() * w;
+        }
+      });
+
+      requestAnimationFrame(renderAtmosphere);
+    }
+
+    const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (!prefersReducedMotion) {
+      renderAtmosphere();
+    }
+  }
+
+  // Initialize
+  populateConfig();
 });
